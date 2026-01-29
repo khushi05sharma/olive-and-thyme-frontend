@@ -1,12 +1,27 @@
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+
+import Home from "./pages/Home";
+import AddRecipe from "./pages/AddRecipe";
+import Dashboard from "./pages/Dashboard";
+import Notifications from "./pages/Notifications";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import RecipeDetail from "./pages/RecipeDetail";
+
 function App() {
   return (
-    <div className="min-h-screen bg-primary-light flex items-center justify-center">
-      <h1 className="text-4xl font-bold text-primary-dark">
-        Olive & Thyme is Live 🍽️
-      </h1>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/recipe/:id" element={<RecipeDetail />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/add-recipe" element={<AddRecipe />} />
+        <Route path="/notifications" element={<Notifications />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
 export default App;
-
