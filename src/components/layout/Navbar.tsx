@@ -270,12 +270,12 @@ const Navbar: FC = () => {
   const closeProfile = () => setIsProfileOpen(false);
 
   const navLinkClasses = ({ isActive }: { isActive: boolean }) =>
-    `flex items-center p-2 rounded-lg transition
- ${
-   isActive
-     ? "bg-primary text-white"
-     : "text-gray-700 hover:text-primary hover:bg-primary-light"
- }`;
+    `flex items-center px-4 py-2 rounded-xl transition-all duration-300
+   ${
+     isActive
+       ? "bg-gradient-to-r from-[#FF8A00] to-[#FFA94D] text-white shadow-md"
+       : "text-gray-700 hover:text-primary hover:bg-primary-light"
+   }`;
 
   return (
     <nav className="sticky top-0 z-50 bg-white shadow-sm">
@@ -309,6 +309,66 @@ const Navbar: FC = () => {
                 placeholder="Search for the Recipes..."
                 className="w-full py-2 pl-10 pr-4 border border-orange-300 rounded-2xl focus:outline-orange-800"
               />
+            </div>
+          </div>
+
+          {/* RIGHT: Desktop & Tablet Nav */}
+          <div className="relative items-center hidden space-x-4 md:flex">
+            <NavLink to="/" className={navLinkClasses}>
+              <Home size={20} />
+              <span className="hidden ml-4 lg:inline">Home</span>
+            </NavLink>
+            <NavLink to="/add-recipe" className={navLinkClasses}>
+              <Plus size={20} />
+              <span className="hidden ml-2 lg:inline">Add Recipe</span>
+            </NavLink>
+            <NavLink to="/dashboard" className={navLinkClasses}>
+              <LayoutDashboard size={20} />
+              <span className="hidden ml-2 lg:inline ">Dashboard</span>
+            </NavLink>
+            {/* Notifications (not active-tracked) */}
+            <Link
+              to="/notifications"
+              className="p-2 text-gray-700 transition rounded-lg hover:text-primary hover:bg-primary-light"
+            >
+              <Bell size={22} />
+            </Link>
+            {/* AVATAR + DROPDOWN */}
+            <div className="relative">
+              <button
+                onClick={toggleProfile}
+                className="flex items-center justify-center w-10 h-10 font-bold text-white transition rounded-full bg-primary hover:bg-orange-600"
+              >
+                S
+              </button>
+
+              {isProfileOpen && (
+                <div className="absolute right-0 w-48 mt-2 bg-white border rounded-lg shadow-lg">
+                  <Link
+                    to="/dashboard"
+                    onClick={closeProfile}
+                    className="flex items-center gap-3 px-4 py-2 hover:bg-primary-light"
+                  >
+                    <LayoutDashboard size={18} />
+                    Dashboard
+                  </Link>
+                  <Link
+                    to="/dashboard"
+                    onClick={closeProfile}
+                    className="flex items-center gap-3 px-4 py-2 hover:bg-primary-light"
+                  >
+                    <Bookmark size={18} />
+                    Saved Recipes
+                  </Link>
+                  <button
+                    onClick={closeProfile}
+                    className="flex items-center w-full gap-3 px-4 py-2 text-left text-red-600 hover:bg-red-50"
+                  >
+                    <LogOut size={18} />
+                    Logout
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
