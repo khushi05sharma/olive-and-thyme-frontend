@@ -1,6 +1,8 @@
 // Import routing components from react-router-dom
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
+import Layout from './components/layout/Layout';
+
 //Import all page components
 import Home from "./pages/Home";
 import AddRecipe from "./pages/AddRecipe";
@@ -14,6 +16,7 @@ function App() {
   return (
     <BrowserRouter>
       {/* React Router will match the current URL to ONE of these routes */}
+      <Layout>
       <Routes>
         {/* element prop specifies which component to render */}
         <Route path="/" element={<Home />} />
@@ -25,6 +28,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
       </Routes>
+      </Layout>
     </BrowserRouter>
   );
 }
