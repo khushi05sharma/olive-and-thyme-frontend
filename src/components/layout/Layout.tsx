@@ -39,6 +39,4 @@ function Layout({ children }: LayoutProps) {
   );
 }
 
-// EXPORT
-
 export default Layout;
