@@ -1,5 +1,5 @@
 import { type FC, type ButtonHTMLAttributes, type ReactNode } from "react";
-
+// TYPES
 type ButtonVariant = "primary" | "secondary" | "danger" | "ghost";
 type ButtonSize = "small" | "medium" | "large";
 
@@ -9,6 +9,8 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   className?: string;
 }
+
+// STYLE MAP
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary: "bg-primary text-white hover:bg-orange-600 focus:ring-primary",
