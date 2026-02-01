@@ -2,6 +2,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import Layout from './components/layout/Layout';
+import TestComponents from './pages/TestComponents';
 
 //Import all page components
 import Home from "./pages/Home";
@@ -25,6 +26,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/add-recipe" element={<AddRecipe />} />
         <Route path="/notifications" element={<Notifications />} />
+        <Route path="/test" element={<TestComponents />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
       </Routes>

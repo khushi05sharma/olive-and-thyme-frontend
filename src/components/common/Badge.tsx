@@ -5,7 +5,7 @@ type BadgeVariant = "primary" | "secondary" | "success" | "warning" | "danger";
 interface BadgeProps {
   variant?: BadgeVariant;
   children: ReactNode;
-  icon: ReactNode;
+  icon?: ReactNode;
   className?: string;
 }
 
