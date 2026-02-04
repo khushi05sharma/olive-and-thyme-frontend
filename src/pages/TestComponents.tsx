@@ -12,9 +12,6 @@ import Input from "../components/common/Input";
 const TestComponents: FC = () => {
   return (
     <div className="max-w-3xl px-4 py-10 mx-auto space-y-12">
-      {/* ════════════════════════════ */}
-      {/* BUTTONS */}
-      {/* ════════════════════════════ */}
       <section>
         <h2 className="mb-6 text-2xl font-bold text-gray-800">Buttons</h2>
 
@@ -28,29 +25,31 @@ const TestComponents: FC = () => {
             <Button variant="ghost">Ghost</Button>
           </div>
         </div>
-
         {/* Sizes */}
         <div className="mb-4">
           <p className="mb-2 text-sm text-gray-500">Sizes</p>
           <div className="flex flex-wrap items-center gap-3">
-            <Button variant="primary" size="small">Small</Button>
-            <Button variant="primary" size="medium">Medium</Button>
-            <Button variant="primary" size="large">Large</Button>
+            <Button size="small">Small</Button>
+            <Button size="medium">Medium</Button>
+            <Button size="large">Large</Button>
           </div>
         </div>
-
         {/* Disabled */}
         <div className="mb-4">
           <p className="mb-2 text-sm text-gray-500">Disabled</p>
           <div className="flex flex-wrap gap-3">
-            <Button variant="primary" disabled>Disabled Primary</Button>
-            <Button variant="secondary" disabled>Disabled Secondary</Button>
+            <Button variant="primary" disabled>
+              Primary-disabled
+            </Button>
+            <Button variant="secondary" disabled>
+              Secondary-disabled
+            </Button>
           </div>
         </div>
 
-        {/* With Icons (lucide icons work inside Button because children accepts ReactNode) */}
-        <div>
-          <p className="mb-2 text-sm text-gray-500">With Icons</p>
+        {/* icons */}
+        <div className="mb-4">
+          <p className="mb-2 text-sm text-gray-500">Icons</p>
           <div className="flex flex-wrap gap-3">
             <Button variant="primary">
               <Search size={16} /> Search
@@ -62,9 +61,6 @@ const TestComponents: FC = () => {
         </div>
       </section>
 
-      {/* ════════════════════════════ */}
-      {/* BADGES */}
-      {/* ════════════════════════════ */}
       <section>
         <h2 className="mb-6 text-2xl font-bold text-gray-800">Badges</h2>
 
@@ -74,15 +70,14 @@ const TestComponents: FC = () => {
           <div className="flex flex-wrap gap-2">
             <Badge variant="primary">Primary</Badge>
             <Badge variant="secondary">Secondary</Badge>
+            <Badge variant="danger">Danger</Badge>
             <Badge variant="success">Success</Badge>
             <Badge variant="warning">Warning</Badge>
-            <Badge variant="danger">Danger</Badge>
           </div>
         </div>
 
-        {/* Real-world usage examples */}
         <div className="mb-4">
-          <p className="mb-2 text-sm text-gray-500">Cuisine Tags</p>
+          <p className="mb-2 text-sm text-gray-500">Cusine Tags</p>
           <div className="flex flex-wrap gap-2">
             <Badge variant="primary">Italian</Badge>
             <Badge variant="primary">Indian</Badge>
@@ -92,7 +87,7 @@ const TestComponents: FC = () => {
         </div>
 
         <div className="mb-4">
-          <p className="mb-2 text-sm text-gray-500">Meal Types</p>
+          <p className="mb-2 text-sm text-gray-500">Meal Type</p>
           <div className="flex flex-wrap gap-2">
             <Badge variant="secondary">Breakfast</Badge>
             <Badge variant="secondary">Lunch</Badge>
@@ -105,20 +100,23 @@ const TestComponents: FC = () => {
         <div>
           <p className="mb-2 text-sm text-gray-500">With Icons</p>
           <div className="flex flex-wrap gap-2">
-            <Badge variant="success" icon={<Leaf size={12} />}>Vegan</Badge>
-            <Badge variant="warning" icon={<Clock size={12} />}>45 min</Badge>
-            <Badge variant="primary" icon={<Leaf size={12} />}>Vegetarian</Badge>
+            <Badge variant="success" icon={<Leaf size={12} />}>
+              Vegan
+            </Badge>
+            <Badge variant="warning" icon={<Clock size={12} />}>
+              45 min
+            </Badge>
+            <Badge variant="primary" icon={<Leaf size={12} />}>
+              Vegetarian
+            </Badge>
           </div>
         </div>
       </section>
 
-      {/* ════════════════════════════ */}
-      {/* INPUTS */}
-      {/* ════════════════════════════ */}
       <section>
         <h2 className="mb-6 text-2xl font-bold text-gray-800">Inputs</h2>
 
-        {/* Basic input */}
+          {/* Basic input */}
         <div className="mb-6">
           <p className="mb-2 text-sm text-gray-500">Basic Input</p>
           <Input
@@ -180,7 +178,7 @@ const TestComponents: FC = () => {
             required
           />
         </div>
-      </section>
+        </section>
     </div>
   );
 };
