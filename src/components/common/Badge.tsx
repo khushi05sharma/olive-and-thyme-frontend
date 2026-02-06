@@ -1,10 +1,8 @@
 import { type FC, type ReactNode } from "react";
 import { type MealType } from "../../types/recipe";
 
-
 // TYPES
 type BadgeVariant = "primary" | "secondary" | "success" | "warning" | "danger";
-
 
 interface BadgeProps {
   variant?: BadgeVariant;
