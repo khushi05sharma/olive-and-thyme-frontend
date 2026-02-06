@@ -1,3 +1,11 @@
+export type MealType =
+  | "Breakfast"
+  | "Lunch"
+  | "Dinner"
+  | "Dessert"
+  | "Snacks"
+  | "Drinks";
+
 export interface Recipe {
   id: string;
   title: string;
@@ -7,7 +15,7 @@ export interface Recipe {
   servings: number;
   difficulty: "Easy" | "Medium" | "Hard";
   cuisine: string; // "Italian", "Indian", etc.
-  mealType: string; // "Breakfast", "Lunch", "Dinner", "Dessert"
+  mealType:MealType; // "Breakfast", "Lunch", "Dinner", "Dessert"
   diet: string[]; // ["Vegetarian", "Vegan", etc.]
   ingredients: string[];
   instructions: string[];
@@ -21,3 +29,5 @@ export interface Recipe {
   };
   createdAt?: string; // Optional
 }
+
+
