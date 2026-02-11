@@ -5,6 +5,11 @@ import pizzaImg from "../assets/pizza.jpg";
 import curryImg from "../assets/curry.jpg";
 import pancakeImg from "../assets/pancake.jpg";
 import cakeImg from "../assets/cake.jpg";
+import quinoaSaladImg from "../assets/Mediterranean Quinoa Salad.jpg";
+import sandwichImg from "../assets/Grill Sandwich.jpg";
+import chickenBurgerImg from "../assets/Chicken Burger.jpg";
+import crustedSalmonImg from "../assets/Herb Crusted Salmon.jpg";
+import smoothieImg from "../assets/mango smoothie.jpg";
 
 export const mockRecipes: Recipe[] = [
   {
@@ -184,5 +189,164 @@ export const mockRecipes: Recipe[] = [
       name: "Manya Rajwar",
     },
     createdAt: "Feb 25",
+  },
+  {
+    id: "6",
+    title: "Mediterranean Quinoa Salad",
+    description:
+      "A refreshing and protein-packed quinoa salad with olives, cucumber, cherry tomatoes, and feta.",
+    image: quinoaSaladImg,
+    cookingTime: 20,
+    servings: 2,
+    difficulty: "Easy",
+    cuisine: "Mediterranean",
+    mealType: "Lunch",
+    diet: ["Vegan"],
+    ingredients: [
+      "1 cup cooked quinoa",
+      "1 cucumber diced",
+      "1 cup cherry tomatoes",
+      "Olives",
+      "Olive oil",
+      "Lemon juice",
+    ],
+    instructions: [
+      "Cook quinoa and let it cool.",
+      "Mix chopped vegetables in a bowl.",
+      "Add quinoa and toss well.",
+      "Drizzle olive oil and lemon juice.",
+      "Season and serve chilled.",
+    ],
+    likes: 18,
+    author: {
+      id: "user4",
+      name: "Annu Sharma",
+    },
+    createdAt: "Feb 18",
+  },
+  {
+    id: "7",
+    title: "Spicy Chicken Burger",
+    description:
+      "Juicy grilled chicken burger with spicy mayo and fresh lettuce.",
+    image: chickenBurgerImg,
+    cookingTime: 35,
+    servings: 2,
+    difficulty: "Medium",
+    cuisine: "American",
+    mealType: "Lunch",
+    diet: ["Non-Vegetarian"],
+    ingredients: [
+      "2 burger buns",
+      "2 chicken patties",
+      "Lettuce",
+      "Spicy mayo",
+      "Cheese slices",
+    ],
+    instructions: [
+      "Grill chicken patties until cooked.",
+      "Toast burger buns lightly.",
+      "Assemble with lettuce, chicken, and mayo.",
+      "Serve hot.",
+    ],
+    likes: 64,
+    author: {
+      id: "user5",
+      name: "Nannu Papnai",
+    },
+    createdAt: "Mar 01",
+  },
+  {
+    id: "8",
+    title: "Creamy Mango Smoothie",
+    description:
+      "A chilled mango smoothie blended with yogurt and honey, perfect for summer.",
+    image: smoothieImg,
+    cookingTime: 10,
+    servings: 1,
+    difficulty: "Easy",
+    cuisine: "Indian",
+    mealType: "Drinks",
+    diet: ["Vegetarian"],
+    ingredients: ["1 ripe mango", "1 cup yogurt", "1 tbsp honey", "Ice cubes"],
+    instructions: [
+      "Peel and chop mango.",
+      "Blend all ingredients until smooth.",
+      "Serve chilled.",
+    ],
+    likes: 22,
+    author: {
+      id: "user2",
+      name: "Khushi Sharma",
+    },
+    createdAt: "Mar 05",
+  },
+  {
+    id: "9",
+    title: "Grilled Veggie Sandwich",
+    description:
+      "A crispy grilled sandwich stuffed with fresh vegetables and cheese.",
+    image: sandwichImg,
+    cookingTime: 15,
+    servings: 2,
+    difficulty: "Easy",
+    cuisine: "Indian",
+    mealType: "Snacks",
+    diet: ["Vegetarian"],
+    ingredients: [
+      "4 bread slices",
+      "Capsicum",
+      "Onion",
+      "Cheese slices",
+      "Butter",
+    ],
+    instructions: [
+      "Spread butter on bread slices.",
+      "Layer vegetables and cheese.",
+      "Grill until golden brown.",
+      "Cut and serve hot.",
+    ],
+    likes: 31,
+    author: {
+      id: "user6",
+      name: "Kavya Sharma",
+    },
+    createdAt: "Feb 14",
+  },
+  {
+    id: "10",
+    title: "Herb-Crusted Baked Salmon",
+    description:
+      "Tender oven-baked salmon topped with a fresh herb crust and a squeeze of lemon. Elegant and flavorful.",
+    image: crustedSalmonImg,
+    cookingTime: 35,
+    servings: 2,
+    difficulty: "Hard",
+    cuisine: "Mediterranean",
+    mealType: "Dinner",
+    diet: ["Non-Vegetarian"],
+    ingredients: [
+      "2 salmon fillets",
+      "2 tbsp olive oil",
+      "Fresh parsley",
+      "Fresh thyme",
+      "2 garlic cloves",
+      "Lemon zest",
+      "Salt & pepper",
+    ],
+    instructions: [
+      "Preheat oven to 400°F (200°C).",
+      "Mix chopped herbs, garlic, lemon zest, and olive oil.",
+      "Place salmon on baking tray and season.",
+      "Spread herb mixture evenly on top.",
+      "Bake for 15–18 minutes until flaky.",
+      "Serve with roasted vegetables or salad.",
+    ],
+    likes: 76,
+    author: {
+      id: "user7",
+      name: "Manya Rajwar",
+    },
+    createdAt: "Mar 03",
   },
 ];
