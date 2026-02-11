@@ -27,7 +27,7 @@ const mealTypeStyles: Record<MealType, string> = {
   Dinner: "bg-blue-50 text-blue-700 border border-blue-500",
   Dessert: "bg-pink-50 text-pink-700 border border-pink-500",
   Snacks: "bg-yellow-50 text-yellow-700 border border-yellow-500",
-  Drinks: "bg-teal-50 text-teal-700 border border-teal-500",
+  Drinks: "bg-red-50 text-red-700 border border-red-500",
 };
 
 // COMPONENT
