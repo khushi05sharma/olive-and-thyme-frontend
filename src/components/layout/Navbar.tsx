@@ -30,7 +30,7 @@ const Navbar: FC = () => {
   {
     /* this do true to check after login navbar and false for login signup one */
   }
-  const isLoggedIn: boolean = false;
+  const isLoggedIn: boolean = true;
 
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
   const closeMenu = () => setIsMenuOpen(false);
