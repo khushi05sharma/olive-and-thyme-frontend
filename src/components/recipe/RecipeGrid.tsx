@@ -1,22 +1,16 @@
-// src/components/recipe/RecipeGrid.tsx
-
 import { type FC } from "react";
 import { type Recipe } from "../../types/recipe";
 import RecipeCard from "./RecipeCard";
 
-// ============================================
 // TYPESCRIPT INTERFACE
-// ============================================
 
 interface RecipeGridProps {
   recipes: Recipe[];
-  title?: string; // Optional section title
+  title?: string;
   emptyMessage?: string; // Message when no recipes
 }
 
-// ============================================
 // RECIPE GRID COMPONENT
-// ============================================
 
 const RecipeGrid: FC<RecipeGridProps> = ({
   recipes,
