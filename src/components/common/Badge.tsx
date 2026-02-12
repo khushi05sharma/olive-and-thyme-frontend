@@ -1,10 +1,10 @@
-import { type FC, type ReactNode } from "react";
+import { type FC, type ReactNode, type HTMLAttributes } from "react";
 import { type MealType } from "../../types/recipe";
 
 // TYPES
 type BadgeVariant = "primary" | "secondary" | "success" | "warning" | "danger";
 
-interface BadgeProps {
+interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   variant?: BadgeVariant;
   mealType?: MealType;
   children: ReactNode;
@@ -37,6 +37,7 @@ const Badge: FC<BadgeProps> = ({
   children,
   icon,
   className = "",
+  ...props
 }) => {
   const baseStyles = `
     inline-flex items-center gap-1
@@ -58,7 +59,7 @@ const Badge: FC<BadgeProps> = ({
     .trim();
 
   return (
-    <span className={combined}>
+    <span className={combined} {...props}>
       {icon && <span className="inline-flex">{icon}</span>}
       {children}
     </span>
