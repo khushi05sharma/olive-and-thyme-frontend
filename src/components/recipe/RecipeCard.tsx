@@ -4,6 +4,7 @@ import { Heart, Bookmark, Clock } from "lucide-react";
 
 import { type Recipe } from "../../types/recipe";
 import Badge from "../common/Badge";
+import RecipeImage from "../common/RecipeImage";
 
 // TYPESCRIPT INTERFACE
 interface RecipeCardProps {
@@ -47,11 +48,11 @@ const RecipeCard: FC<RecipeCardProps> = ({ recipe }) => {
     >
       <div className="relative overflow-hidden bg-gray-200 aspect-video">
         {/* IMAGE SECTION */}
-        <img
+        <RecipeImage
           src={recipe.image}
           alt={recipe.title}
           className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
-          loading="lazy" // Lazy load images for performance
+          loading="lazy"
         />
         {/* Overlay Gradient (makes text readable on image) */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
