@@ -191,6 +191,65 @@ const Dashboard: FC = () => {
               New Recipe
             </Button>
           </div>
+
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 gap-4 mt-6 sm:grid-cols-3">
+            <StatCard
+              icon={<ChefHat className="text-primary" />}
+              value={userStats.recipesCount}
+              label="Recipes"
+              color="bg-orange-50"
+            />
+            <StatCard
+              icon={<Heart className="text-red-500" />}
+              value={userStats.totalLikes}
+              label="Total Likes"
+              color="bg-red-50"
+            />
+            <StatCard
+              icon={<Bookmark className="text-blue-500" />}
+              value={userStats.savedCount}
+              label="Saved"
+              color="bg-blue-50"
+            />
+          </div>
+        </div>
+
+        {/* TAB NAVIGATION */}
+
+        <div className="mb-6">
+          <div className="flex gap-2 p-1 bg-white rounded-lg shadow-sm">
+            <button
+              onClick={() => setActiveTab("my-recipes")}
+              className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition ${
+                activeTab === "my-recipes"
+                  ? "bg-primary text-white"
+                  : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+              }`}
+            >
+              My Recipes ({myRecipes.length})
+            </button>
+            <button
+              onClick={() => setActiveTab("saved")}
+              className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition ${
+                activeTab === "saved"
+                  ? "bg-primary text-white"
+                  : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+              }`}
+            >
+              Saved ({savedRecipes.length})
+            </button>
+            <button
+              onClick={() => setActiveTab("activity")}
+              className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition ${
+                activeTab === "activity"
+                  ? "bg-primary text-white"
+                  : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+              }`}
+            >
+              Activity
+            </button>
+          </div>
         </div>
       </div>
     </div>
