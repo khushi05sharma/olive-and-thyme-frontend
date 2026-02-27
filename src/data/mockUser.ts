@@ -11,8 +11,8 @@ import { type User } from "../types/user";
  */
 export const mockCurrentUser: User = {
   id: "user1",
-  name: "Sharma Sisters",
-  email: "dreamescapetales02@gmail.com",
+  name: "Kate Bridgerton",
+  email: "BridgertonK.05@gmail.com",
   createdAt: "January 2026",
 };
 

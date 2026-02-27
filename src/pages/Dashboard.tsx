@@ -154,7 +154,47 @@ const Dashboard: FC = () => {
   // RENDER
   // ══════════════════════════════════════════
 
-  return <div className="min-h-screen bg-primary-light"></div>;
+  return (
+    <div className="min-h-screen bg-primary-light">
+      <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
+        {/* PROFILE HEADER */}
+        <div className="p-6 mb-8 bg-white rounded-lg shadow-sm sm:p-8">
+          <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
+            {/* user info */}
+            <div className="flex items-center gap-4">
+              {/* Avatar */}
+              <div className="flex items-center justify-center flex-shrink-0 w-20 h-20 text-3xl font-bold text-white rounded-full bg-primary">
+                {currentUser.name.charAt(0)}
+              </div>
+
+              {/* Name & Email */}
+              <div>
+                <h1 className="text-2xl font-bold text-gray-800">
+                  {currentUser.name}
+                </h1>
+                <p className="text-gray-600">{currentUser.email}</p>
+                {currentUser.createdAt && (
+                  <p className="text-sm text-gray-500">
+                    Member since {currentUser.createdAt}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* New Recipe Button */}
+            <Button
+              onClick={() => navigate("/add-recipe")}
+              variant="primary"
+              className="gap-2 whitespace-nowrap"
+            >
+              <Plus size={20} />
+              New Recipe
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Dashboard;
