@@ -251,6 +251,60 @@ const Dashboard: FC = () => {
             </button>
           </div>
         </div>
+
+        {/* CONTENT AREA */}
+
+        <div className="p-6 bg-white rounded-lg shadow-sm">
+          {activeTab === "my-recipes" && (
+            <>
+              {myRecipes.length === 0 ? (
+                <EmptyState
+                  icon="🍳"
+                  title="No recipes yet"
+                  description="You haven't uploaded any recipes yet. Start sharing your culinary creations with the community!"
+                  actionLabel="Upload Your First Recipe"
+                  onAction={() => navigate("/add-recipe")}
+                />
+              ) : (
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {myRecipes.map((recipe) => (
+                    <RecipeCardWithActions key={recipe.id} recipe={recipe} />
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* SAVED RECIPES TAB */}
+          {activeTab === "saved" && (
+            <>
+              {myRecipes.length === 0 ? (
+                <EmptyState
+                  icon="🍳"
+                  title="No saved recipes"
+                  description="You haven't saved any recipes yet. Browse recipes and bookmark your favorites to find them easily later!"
+                  actionLabel="Browse Recipes"
+                  onAction={() => navigate("/")}
+                />
+              ) : (
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {savedRecipes.map((recipe) => (
+                    <RecipeCard key={recipe.id} recipe={recipe} />
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* ACTIVITY TAB */}
+          {activeTab === "activity" && (
+            <EmptyState
+              icon="📊"
+              title="Activity feed coming soon"
+              description="This section will show your recent activity, including likes and comments on your recipes."
+            />
+          )}
+        </div>
       </div>
     </div>
   );
