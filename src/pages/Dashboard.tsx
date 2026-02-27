@@ -1,14 +1,6 @@
 import { type FC, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  ChefHat,
-  Heart,
-  Bookmark,
-  Plus,
-  Edit,
-  Trash2,
-  TrendingUp,
-} from "lucide-react";
+import { ChefHat, Heart, Bookmark, Plus, Edit, Trash2 } from "lucide-react";
 
 import { mockRecipes } from "../data/mockRecipes";
 import { mockCurrentUser, mockSavedRecipeIds } from "../data/mockUser";
@@ -21,9 +13,7 @@ import RecipeCard from "../components/recipe/RecipeCard";
 const Dashboard: FC = () => {
   const navigate = useNavigate();
 
-  // ══════════════════════════════════════════
   // STATE
-  // ══════════════════════════════════════════
 
   // Active tab (my-recipes, saved, activity)
   const [activeTab, setActiveTab] = useState<DashboardTab>("my-recipes");
@@ -33,9 +23,7 @@ const Dashboard: FC = () => {
     mockRecipes.filter((r) => r.author?.id === mockCurrentUser.id),
   );
 
-  // ══════════════════════════════════════════
   // DERIVED DATA
-  // ══════════════════════════════════════════
 
   // Current user (Phase 3: const { user } = useAuth();)
   const currentUser = mockCurrentUser;
@@ -74,9 +62,7 @@ const Dashboard: FC = () => {
     alert(`Edit functionality coming in Phase 3!\nRecipe ID: ${recipeId}`);
   };
 
-  // ══════════════════════════════════════════
   // RENDER HELPER: Stat Card
-  // ══════════════════════════════════════════
 
   const StatCard: FC<{
     icon: React.ReactNode;
@@ -95,9 +81,7 @@ const Dashboard: FC = () => {
     </div>
   );
 
-  // ══════════════════════════════════════════
   // RENDER HELPER: Empty State
-  // ══════════════════════════════════════════
 
   const EmptyState: FC<{
     icon: string;
@@ -116,9 +100,7 @@ const Dashboard: FC = () => {
     </div>
   );
 
-  // ══════════════════════════════════════════
   // RENDER HELPER: Recipe Card with Actions
-  // ══════════════════════════════════════════
 
   const RecipeCardWithActions: FC<{ recipe: any }> = ({ recipe }) => (
     <div className="relative group">
@@ -150,9 +132,7 @@ const Dashboard: FC = () => {
     </div>
   );
 
-  // ══════════════════════════════════════════
   // RENDER
-  // ══════════════════════════════════════════
 
   return (
     <div className="min-h-screen bg-primary-light">
