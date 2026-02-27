@@ -1,5 +1,3 @@
-// src/pages/Dashboard.tsx
-
 import { type FC, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -18,9 +16,7 @@ import { type DashboardTab, type UserStats } from "../types/user";
 import Button from "../components/common/Button";
 import RecipeCard from "../components/recipe/RecipeCard";
 
-// ============================================
 // DASHBOARD PAGE
-// ============================================
 
 const Dashboard: FC = () => {
   const navigate = useNavigate();
@@ -34,7 +30,7 @@ const Dashboard: FC = () => {
 
   // User's recipes (can be deleted locally)
   const [myRecipes, setMyRecipes] = useState(
-    mockRecipes.filter((r) => r.author?.id === mockCurrentUser.id)
+    mockRecipes.filter((r) => r.author?.id === mockCurrentUser.id),
   );
 
   // ══════════════════════════════════════════
@@ -46,7 +42,7 @@ const Dashboard: FC = () => {
 
   // Saved recipes
   const savedRecipes = mockRecipes.filter((r) =>
-    mockSavedRecipeIds.includes(r.id)
+    mockSavedRecipeIds.includes(r.id),
   );
 
   // Calculate user stats
@@ -60,9 +56,7 @@ const Dashboard: FC = () => {
     };
   }, [myRecipes, savedRecipes]);
 
-  // ══════════════════════════════════════════
   // HANDLERS
-  // ══════════════════════════════════════════
 
   const handleDeleteRecipe = (recipeId: string): void => {
     if (window.confirm("Are you sure you want to delete this recipe?")) {
@@ -160,165 +154,7 @@ const Dashboard: FC = () => {
   // RENDER
   // ══════════════════════════════════════════
 
-  return (
-    <div className="min-h-screen bg-primary-light">
-      <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
-        {/* ═══════════════════════════════════════ */}
-        {/* PROFILE HEADER */}
-        {/* ═══════════════════════════════════════ */}
-        <div className="p-6 mb-8 bg-white rounded-lg shadow-sm sm:p-8">
-          <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
-            {/* User Info */}
-            <div className="flex items-center gap-4">
-              {/* Avatar */}
-              <div className="flex items-center justify-center flex-shrink-0 w-20 h-20 text-3xl font-bold text-white rounded-full bg-primary">
-                {currentUser.name.charAt(0)}
-              </div>
-
-              {/* Name & Email */}
-              <div>
-                <h1 className="text-2xl font-bold text-gray-800">
-                  {currentUser.name}
-                </h1>
-                <p className="text-gray-600">{currentUser.email}</p>
-                {currentUser.createdAt && (
-                  <p className="text-sm text-gray-500">
-                    Member since {currentUser.createdAt}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* New Recipe Button */}
-            <Button
-              onClick={() => navigate("/add-recipe")}
-              variant="primary"
-              className="gap-2 whitespace-nowrap"
-            >
-              <Plus size={20} />
-              New Recipe
-            </Button>
-          </div>
-
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 gap-4 mt-6 sm:grid-cols-3">
-            <StatCard
-              icon={<ChefHat className="text-primary" />}
-              value={userStats.recipesCount}
-              label="Recipes"
-              color="bg-orange-50"
-            />
-            <StatCard
-              icon={<Heart className="text-red-500" />}
-              value={userStats.totalLikes}
-              label="Total Likes"
-              color="bg-red-50"
-            />
-            <StatCard
-              icon={<Bookmark className="text-blue-500" />}
-              value={userStats.savedCount}
-              label="Saved"
-              color="bg-blue-50"
-            />
-          </div>
-        </div>
-
-        {/* ═══════════════════════════════════════ */}
-        {/* TAB NAVIGATION */}
-        {/* ═══════════════════════════════════════ */}
-        <div className="mb-6">
-          <div className="flex gap-2 p-1 bg-white rounded-lg shadow-sm">
-            <button
-              onClick={() => setActiveTab("my-recipes")}
-              className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition ${
-                activeTab === "my-recipes"
-                  ? "bg-primary text-white"
-                  : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
-              }`}
-            >
-              My Recipes ({myRecipes.length})
-            </button>
-            <button
-              onClick={() => setActiveTab("saved")}
-              className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition ${
-                activeTab === "saved"
-                  ? "bg-primary text-white"
-                  : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
-              }`}
-            >
-              Saved ({savedRecipes.length})
-            </button>
-            <button
-              onClick={() => setActiveTab("activity")}
-              className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition ${
-                activeTab === "activity"
-                  ? "bg-primary text-white"
-                  : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
-              }`}
-            >
-              Activity
-            </button>
-          </div>
-        </div>
-
-        {/* ═══════════════════════════════════════ */}
-        {/* CONTENT AREA */}
-        {/* ═══════════════════════════════════════ */}
-        <div className="p-6 bg-white rounded-lg shadow-sm">
-          {/* MY RECIPES TAB */}
-          {activeTab === "my-recipes" && (
-            <>
-              {myRecipes.length === 0 ? (
-                <EmptyState
-                  icon="🍳"
-                  title="No recipes yet"
-                  description="You haven't uploaded any recipes yet. Start sharing your culinary creations with the community!"
-                  actionLabel="Upload Your First Recipe"
-                  onAction={() => navigate("/add-recipe")}
-                />
-              ) : (
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {myRecipes.map((recipe) => (
-                    <RecipeCardWithActions key={recipe.id} recipe={recipe} />
-                  ))}
-                </div>
-              )}
-            </>
-          )}
-
-          {/* SAVED RECIPES TAB */}
-          {activeTab === "saved" && (
-            <>
-              {savedRecipes.length === 0 ? (
-                <EmptyState
-                  icon="💾"
-                  title="No saved recipes"
-                  description="You haven't saved any recipes yet. Browse recipes and bookmark your favorites to find them easily later!"
-                  actionLabel="Browse Recipes"
-                  onAction={() => navigate("/")}
-                />
-              ) : (
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {savedRecipes.map((recipe) => (
-                    <RecipeCard key={recipe.id} recipe={recipe} />
-                  ))}
-                </div>
-              )}
-            </>
-          )}
-
-          {/* ACTIVITY TAB */}
-          {activeTab === "activity" && (
-            <EmptyState
-              icon="📊"
-              title="Activity feed coming soon"
-              description="This section will show your recent activity, including likes and comments on your recipes."
-            />
-          )}
-        </div>
-      </div>
-    </div>
-  );
+  return <div className="min-h-screen bg-primary-light"></div>;
 };
 
 export default Dashboard;
