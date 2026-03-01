@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.soft-glow {
+  box-shadow:
+    0 0 0 1px rgba(237, 237, 55, 0.439),
+    0 4px 20px rgba(230, 117, 228, 0.215);
+}

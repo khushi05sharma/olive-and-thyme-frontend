@@ -1,4 +1,4 @@
-export type MealType =
+export type MealType = 
   | "Breakfast"
   | "Lunch"
   | "Dinner"
@@ -15,7 +15,7 @@ export interface Recipe {
   servings: number;
   difficulty: "Easy" | "Medium" | "Hard";
   cuisine: string; // "Italian", "Indian", etc.
-  mealType: MealType; // "Breakfast", "Lunch", "Dinner", "Dessert"
+  mealType: MealType ; // "Breakfast", "Lunch", "Dinner", "Dessert"
   diet: string[]; // ["Vegetarian", "Vegan", etc.]
   ingredients: string[];
   instructions: string[];
