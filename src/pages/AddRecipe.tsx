@@ -579,6 +579,137 @@ const AddRecipe: FC = () => {
           </div>
 
           {/* INGREDIENTS */}
+
+          <div className="p-6 bg-white rounded-lg shadow-sm soft-glow">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-gray-800">
+                Ingredients <span className="text-red-500">*</span>
+              </h2>
+              <Button
+                type="button"
+                onClick={addIngredient}
+                variant="ghost"
+                size="small"
+                className="gap-1"
+              >
+                <Plus size={16} />
+                Add
+              </Button>
+            </div>
+
+            <div className="space-y-3">
+              {formData.ingredients.map((ingredient, index) => (
+                <div key={index} className="flex gap-2">
+                  <span className="flex items-center justify-center flex-shrink-0 w-8 h-10 text-sm font-medium text-gray-600">
+                    {index + 1}.
+                  </span>
+                  <input
+                    type="text"
+                    value={ingredient}
+                    onChange={(e) => updateIngredient(index, e.target.value)}
+                    placeholder="e.g., 2 cups all-purpose flour"
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+                  {formData.ingredients.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeIngredient(index)}
+                      className="p-2 text-red-600 transition rounded-lg hover:bg-red-50"
+                    >
+                      <Trash2 size={20} />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+            {errors.ingredients && (
+              <p className="mt-2 text-sm text-red-500">{errors.ingredients}</p>
+            )}
+          </div>
+
+          {/* INSTRUCTIONS */}
+
+          <div className="p-6 bg-white rounded-lg shadow-sm soft-glow">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-gray-800">
+                Instructions <span className="text-red-500">*</span>
+              </h2>
+              <Button
+                type="button"
+                onClick={addInstruction}
+                variant="ghost"
+                size="small"
+                className="gap-1"
+              >
+                <Plus size={16} />
+                Add Step
+              </Button>
+            </div>
+
+            <div className="space-y-3">
+              {formData.instructions.map((instruction, index) => (
+                <div key={index} className="flex gap-2">
+                  <div className="flex items-center justify-center flex-shrink-0 w-16 h-10 text-sm font-medium text-gray-600">
+                    Step {index + 1}
+                  </div>
+                  <textarea
+                    value={instruction}
+                    onChange={(e) => updateInstruction(index, e.target.value)}
+                    placeholder={`e.g., ${
+                      index === 0
+                        ? "Preheat oven to 350°F"
+                        : "Mix ingredients together"
+                    }`}
+                    rows={2}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+                  {formData.instructions.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeInstruction(index)}
+                      className="p-2 text-red-600 transition rounded-lg hover:bg-red-50"
+                    >
+                      <Trash2 size={20} />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+            {errors.instructions && (
+              <p className="mt-2 text-sm text-red-500">{errors.instructions}</p>
+            )}
+          </div>
+
+          {/* ACTION BUTTONS */}
+
+          <div className="flex flex-col justify-end gap-3 sm:flex-row">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => navigate("/")}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={isSubmitting}
+              className="gap-2"
+            >
+              {isSubmitting ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-white rounded-full border-t-transparent animate-spin"></span>
+                  Publishing...
+                </>
+              ) : (
+                <>
+                  <ChefHat size={20} />
+                  Publish Recipe
+                </>
+              )}
+            </Button>
+          </div>
         </form>
       </div>
     </div>
