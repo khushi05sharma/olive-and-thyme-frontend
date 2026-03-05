@@ -76,6 +76,23 @@ const Login: FC = () => {
     navigate("/");
   };
 
-  return <div></div>;
+  // RENDER
+
+  return (
+    <div className="flex items-center justify-center min-h-screen px-4 py-12 bg-gradient-to-br from-orange-50 via-primary-light to-yellow-50">
+      <div className="w-full max-w-md">
+        {/* logo & title */}
+        <div className="mb-8 text-center">
+          <Link to="/" className="inline-block mb-4">
+            <img src={logo} alt="Olive & Thyme" className="w-16 h-16 mx-auto" />
+          </Link>
+          <h1 className="mb-2 text-3xl font-bold text-gray-800">
+            Welcome Back
+          </h1>
+          <p className="text-gray-600">Sign in to continue to Olive & Thyme</p>
+        </div>
+      </div>
+    </div>
+  );
 };
 export default Login;
