@@ -15,7 +15,7 @@ const Login: FC = () => {
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [showPassword, setShowPaaword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   //HANDLERS
@@ -82,8 +82,8 @@ const Login: FC = () => {
     <div className="flex items-center justify-center min-h-screen px-4 py-12 bg-gradient-to-br from-orange-50 via-primary-light to-yellow-50">
       <div className="w-full max-w-md">
         {/* logo & title */}
-        <div className="mb-8 text-center">
-          <Link to="/" className="inline-block mb-4">
+        <div className="mb-6 text-center">
+          <Link to="/" className="inline-block mb-3">
             <img src={logo} alt="Olive & Thyme" className="w-16 h-16 mx-auto" />
           </Link>
           <h1 className="mb-2 text-3xl font-bold text-gray-800">
@@ -91,6 +91,115 @@ const Login: FC = () => {
           </h1>
           <p className="text-gray-600">Sign in to continue to Olive & Thyme</p>
         </div>
+
+        {/* Login Form */}
+
+        <div className="p-8 bg-white shadow-lg rounded-xl">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* email input*/}
+            <Input
+              label="Email Address"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="you@example.com"
+              icon={<Mail size={18} />}
+              error={errors.email}
+              required
+            />
+
+            {/* password input */}
+            <div>
+              <Input
+                label="Password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="••••••••"
+                icon={<Lock size={18} />}
+                error={errors.password}
+                required
+              />
+
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute text-gray-400 -translate-y-1/2 right-3 top-1/2 hover:text-gray-600"
+                style={{ marginTop: "24px" }}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+
+            {/* forgot password */}
+            <div className="flex items-center justify-between text-sm">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 rounded text-primary focus:ring-primary"
+                />
+                <span className="text-gray-600">Remember me</span>
+              </label>
+              <Link
+                to="/forgot-password"
+                className="font-medium transition text-primary hover:text-orange-600"
+              >
+                Forgot password?
+              </Link>
+            </div>
+
+            {/* submit button */}
+            <Button
+              type="submit"
+              variant="primary"
+              className="w-full gap-2"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <span className="w-5 h-5 border-2 border-white rounded-full border-t-transparent animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                <>
+                  <LogIn size={20} />
+                  Sign In
+                </>
+              )}
+            </Button>
+          </form>
+
+          {/* Divider */}
+          <div className="flex items-center gap-4 my-6">
+            <div className="flex-1 border-t border-gray-300" />
+            <span className="text-sm text-gray-500">OR</span>
+            <div className="flex-1 border-t border-gray-300" />
+          </div>
+          {/* Sign Up Link */}
+          <p className="text-sm text-center text-gray-600">
+            Don't have an account?{" "}
+            <Link
+              to="/signup"
+              className="font-medium transition text-primary hover:text-orange-600"
+            >
+              Sign up for free
+            </Link>
+          </p>
+        </div>
+
+        {/* Footer */}
+        <p className="mt-6 text-xs text-center text-gray-500">
+          By signing in, you agree to our{" "}
+          <a href="#" className="underline hover:text-gray-700">
+            Terms of Service
+          </a>{" "}
+          and{" "}
+          <a href="#" className="underline hover:text-gray-700">
+            Privacy Policy
+          </a>
+        </p>
       </div>
     </div>
   );
