@@ -53,9 +53,8 @@ const Login: FC = () => {
   const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      setIsSubmitting(true);
-    }
+    if (!validateForm()) return;
+    setIsSubmitting(true);
 
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -79,23 +78,29 @@ const Login: FC = () => {
   // RENDER
 
   return (
-    <div className="flex items-center justify-center min-h-screen px-4 py-12 bg-gradient-to-br from-orange-50 via-primary-light to-yellow-50">
-      <div className="w-full max-w-md">
+    <div className="flex flex-col items-center justify-center min-h-screen px-4 py-10 sm:px-6 lg:px-8 sm:py-12 bg-gradient-to-br from-orange-50 via-primary-light to-yellow-50">
+      <div className="w-full max-w-md mx-auto sm:max-w-lg md:max-w-md">
         {/* logo & title */}
         <div className="mb-6 text-center">
           <Link to="/" className="inline-block mb-3">
-            <img src={logo} alt="Olive & Thyme" className="w-16 h-16 mx-auto" />
+            <img
+              src={logo}
+              alt="Olive & Thyme"
+              className="w-12 h-12 mx-auto sm:w-14 sm:h-14 md:w-16 md:h-16"
+            />
           </Link>
-          <h1 className="mb-2 text-3xl font-bold text-gray-800">
+          <h1 className="mb-2 text-xl font-bold text-gray-800 sm:text-2xl md:text-3xl">
             Welcome Back
           </h1>
-          <p className="text-gray-600">Sign in to continue to Olive & Thyme</p>
+          <p className="text-sm text-gray-600 sm:text-base">
+            Sign in to continue to Olive & Thyme
+          </p>
         </div>
 
         {/* Login Form */}
 
-        <div className="p-8 bg-white shadow-lg rounded-xl">
-          <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="w-full p-5 bg-white shadow-lg sm:p-6 md:p-8 rounded-xl">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
             {/* email input*/}
             <Input
               label="Email Address"
@@ -110,7 +115,7 @@ const Login: FC = () => {
             />
 
             {/* password input */}
-            <div>
+            <div className="relative">
               <Input
                 label="Password"
                 name="password"
@@ -126,8 +131,7 @@ const Login: FC = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute text-gray-400 -translate-y-1/2 right-3 top-1/2 hover:text-gray-600"
-                style={{ marginTop: "24px" }}
+                className="absolute right-3 top-[38px] text-gray-400 hover:text-gray-600"
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -154,7 +158,7 @@ const Login: FC = () => {
             <Button
               type="submit"
               variant="primary"
-              className="w-full gap-2"
+              className="w-full gap-2 text-sm sm:text-base"
               disabled={isSubmitting}
             >
               {isSubmitting ? (
@@ -190,7 +194,7 @@ const Login: FC = () => {
         </div>
 
         {/* Footer */}
-        <p className="mt-6 text-xs text-center text-gray-500">
+        <p className="mt-6 text-[11px] sm:text-xs text-center text-gray-500">
           By signing in, you agree to our{" "}
           <a href="#" className="underline hover:text-gray-700">
             Terms of Service
