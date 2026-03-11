@@ -24,6 +24,7 @@ export const mockRecipes: Recipe[] = [
     cuisine: "Italian",
     mealType: "Dinner",
     diet: ["Vegetarian"],
+    healthGoals: ["Low Carb"],
     ingredients: [
       "500g pizza dough",
       "200g mozzarella cheese",
@@ -325,6 +326,7 @@ export const mockRecipes: Recipe[] = [
     cuisine: "Mediterranean",
     mealType: "Dinner",
     diet: ["Non-Vegetarian"],
+    healthGoals: ["High Protein", "Heart Healthy"],
     ingredients: [
       "2 salmon fillets",
       "2 tbsp olive oil",

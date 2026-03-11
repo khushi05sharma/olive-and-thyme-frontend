@@ -7,6 +7,7 @@ export interface FilterState {
   mealType: string[];
   cuisine: string[];
   diet: string[];
+  healthGoals: string[];
 }
 
 interface FilterSidebarProps {
@@ -42,6 +43,15 @@ const DIETS = [
   "Low-Carb",
 ];
 
+const HEALTH_GOALS = [
+  "High Protein",
+  "Weight Loss",
+  "Immunity Boost",
+  "Iron Rich",
+  "Low Carb",
+  "Heart Healthy",
+];
+
 // COLOR STYLES PER CATEGORY
 // Meal Type: Orange theme
 const MEAL_TYPE_COLORS = {
@@ -62,6 +72,12 @@ const DIET_COLORS = {
   active: "bg-blue-600 text-white border-blue-600",
 };
 
+// Health Goals: Purple theme
+const HEALTH_COLORS = {
+  inactive: "bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100",
+  active: "bg-purple-600 text-white border-purple-600",
+};
+
 // FILTER SIDEBAR COMPONENT
 
 const FilterSidebar: FC<FilterSidebarProps> = ({
@@ -74,6 +90,7 @@ const FilterSidebar: FC<FilterSidebarProps> = ({
     mealType: true,
     cuisine: true,
     diet: true,
+    healthGoals: true,
   });
 
   // TOGGLE FILTER SELECTION
@@ -103,6 +120,7 @@ const FilterSidebar: FC<FilterSidebarProps> = ({
       mealType: [],
       cuisine: [],
       diet: [],
+      healthGoals: [],
     });
   };
 
@@ -120,7 +138,8 @@ const FilterSidebar: FC<FilterSidebarProps> = ({
   const hasActiveFilters =
     selectedFilters.mealType.length > 0 ||
     selectedFilters.cuisine.length > 0 ||
-    selectedFilters.diet.length > 0;
+    selectedFilters.diet.length > 0 ||
+    selectedFilters.healthGoals.length > 0;
 
   // GET COLOR SCHEME FOR CATEGORY
 
@@ -132,6 +151,8 @@ const FilterSidebar: FC<FilterSidebarProps> = ({
         return CUISINE_COLORS;
       case "diet":
         return DIET_COLORS;
+         case "healthGoals":
+      return HEALTH_COLORS;
       default:
         return MEAL_TYPE_COLORS;
     }
@@ -203,6 +224,10 @@ const FilterSidebar: FC<FilterSidebarProps> = ({
         category: "diet" as const,
         value: f,
       })),
+      ...selectedFilters.healthGoals.map((f) => ({
+  category: "healthGoals" as const,
+  value: f,
+})),
     ];
 
     if (allActive.length === 0) return null;
@@ -267,6 +292,7 @@ const FilterSidebar: FC<FilterSidebarProps> = ({
           {renderFilterSection("🍳 Meal Type", "mealType", MEAL_TYPES)}
           {renderFilterSection("🌍 Cuisine", "cuisine", CUISINES)}
           {renderFilterSection("🥗 Diet", "diet", DIETS)}
+          {renderFilterSection("❤️ Health Goals", "healthGoals", HEALTH_GOALS)}
         </div>
 
         {/* Result Count */}

@@ -36,5 +36,14 @@ export const filterRecipes = (
     );
   }
 
+  // FILTER BY HEALTH GOALS 
+  if (filters.healthGoals.length > 0) {
+    result = result.filter((recipe) =>
+      recipe.healthGoals?.some((goal) =>
+        filters.healthGoals.includes(goal)
+      )
+    );
+  }
+
   return result;
 };

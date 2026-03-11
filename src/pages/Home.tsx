@@ -19,6 +19,7 @@ const Home: FC = () => {
     mealType: [],
     cuisine: [],
     diet: [],
+    healthGoals: [],
   });
 
   // DERIVED DATA
