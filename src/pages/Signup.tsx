@@ -156,11 +156,11 @@ const Signup: FC = () => {
                 error={errors.password}
                 required
               />
+
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute text-gray-400 -translate-y-1/2 right-3 top-1/2 hover:text-gray-600"
-                style={{ marginTop: "24px" }}
+                className="absolute right-3 top-[38px] text-gray-400 hover:text-gray-600"
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -179,16 +179,15 @@ const Signup: FC = () => {
                 error={errors.confirmPassword}
                 required
               />
+
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute text-gray-400 -translate-y-1/2 right-3 top-1/2 hover:text-gray-600"
-                style={{ marginTop: "24px" }}
+                className="absolute right-3 top-[38px] text-gray-400 hover:text-gray-600"
               >
                 {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
-
             {/* Terms Checkbox */}
             <label className="flex items-start gap-2 text-sm cursor-pointer">
               <input

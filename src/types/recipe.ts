@@ -17,6 +17,7 @@ export interface Recipe {
   cuisine: string; // "Italian", "Indian", etc.
   mealType: MealType ; // "Breakfast", "Lunch", "Dinner", "Dessert"
   diet: string[]; // ["Vegetarian", "Vegan", etc.]
+  healthGoals?: string[];   
   ingredients: string[];
   instructions: string[];
   likes: number;
