@@ -74,7 +74,8 @@ const DIET_COLORS = {
 
 // Health Goals: Purple theme
 const HEALTH_COLORS = {
-  inactive: "bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100",
+  inactive:
+    "bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100",
   active: "bg-purple-600 text-white border-purple-600",
 };
 
@@ -151,8 +152,8 @@ const FilterSidebar: FC<FilterSidebarProps> = ({
         return CUISINE_COLORS;
       case "diet":
         return DIET_COLORS;
-         case "healthGoals":
-      return HEALTH_COLORS;
+      case "healthGoals":
+        return HEALTH_COLORS;
       default:
         return MEAL_TYPE_COLORS;
     }
@@ -225,9 +226,9 @@ const FilterSidebar: FC<FilterSidebarProps> = ({
         value: f,
       })),
       ...selectedFilters.healthGoals.map((f) => ({
-  category: "healthGoals" as const,
-  value: f,
-})),
+        category: "healthGoals" as const,
+        value: f,
+      })),
     ];
 
     if (allActive.length === 0) return null;
