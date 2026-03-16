@@ -70,21 +70,28 @@ const healthGoalToDiet: Record<string, string> = {
 export async function fetchRecipes(
   query: string = "healthy",
   healthGoals: string[] = [],
+  mealType: string = "",
+  cuisine: string = "",
+  diet: string = "",
 ): Promise<Recipe[]> {
-  // Convert selected health goals to Spoonacular diet tags
-  const dietTags = healthGoals
-    .map((goal) => healthGoalToDiet[goal]) // "Heart Healthy" → "heart healthy"
-    .filter(Boolean) // remove any that didn't match
-    .join(","); // "heart healthy,diabetic"
-
   const url = new URL(`${BASE_URL}/recipes/complexSearch`);
   url.searchParams.append("query", query);
   url.searchParams.append("number", "20");
   url.searchParams.append("addRecipeInformation", "true");
   url.searchParams.append("apiKey", API_KEY);
 
-  if (dietTags) {
-    url.searchParams.append("diet", dietTags); // only added if user selected something
+  if (mealType) url.searchParams.append("type", mealType.toLocaleLowerCase());
+  if (cuisine) url.searchParams.append("cuisine", cuisine.toLocaleLowerCase());
+  if (diet) url.searchParams.append("diet", diet.toLocaleLowerCase());
+
+  const goalTag = healthGoals
+    .map((g) => healthGoalToDiet[g])
+    .filter(Boolean)
+    .join(",");
+
+  if (goalTag) {
+    const existing = url.searchParams.get("diet");
+    url.searchParams.set("diet", existing ? `${existing},${goalTag}` : goalTag);
   }
 
   const response = await fetch(url.toString());
@@ -97,6 +104,20 @@ export async function fetchRecipes(
     return [];
   }
 
+  const data: SpoonacularListResponse = await response.json();
+  return data.results.map(toRecipe);
+}
+
+export async function fetchTrendingRecipes(): Promise<Recipe[]> {
+  const url = new URL(`${BASE_URL}/recipes/complexSearch`);
+  url.searchParams.append("queue", "popular");
+  url.searchParams.append("sort", "popularity");
+  url.searchParams.append("number", "4");
+  url.searchParams.append("addRecipeInformation", "true");
+  url.searchParams.append("apiKey", API_KEY);
+
+  const response = await fetch(url.toString());
+  if (!response.ok) throw new Error(`API error: ${response.status}`);
   const data: SpoonacularListResponse = await response.json();
   return data.results.map(toRecipe);
 }
