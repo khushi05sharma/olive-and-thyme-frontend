@@ -40,16 +40,19 @@ const DIETS = [
   "Dairy-Free",
   "Keto",
   "Paleo",
-  "Low-Carb",
 ];
 
 const HEALTH_GOALS = [
-  "High Protein",
-  "Weight Loss",
-  "Immunity Boost",
-  "Iron Rich",
-  "Low Carb",
   "Heart Healthy",
+  "Diabetic Friendly",
+  "High Protein",
+  "Low Sodium",
+  "Low Carb",
+  "Anti-Inflammatory",
+  "Gut Friendly",
+  "Weight Management",
+  "Kidney Friendly",
+  "Immune Boosting",
 ];
 
 // COLOR STYLES PER CATEGORY

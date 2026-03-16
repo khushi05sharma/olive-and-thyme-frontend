@@ -17,7 +17,18 @@ export interface Recipe {
   cuisine: string; // "Italian", "Indian", etc.
   mealType: MealType ; // "Breakfast", "Lunch", "Dinner", "Dessert"
   diet: string[]; // ["Vegetarian", "Vegan", etc.]
-  healthGoals?: string[];   
+  healthGoals?: (
+  | "Heart Healthy"
+  | "Diabetic Friendly"
+  | "High Protein"
+  | "Low Sodium"
+  | "Low Carb"
+  | "Anti-Inflammatory"
+  | "Gut Friendly"
+  | "Weight Management"
+  | "Kidney Friendly"
+  | "Immune Boosting"
+)[];
   ingredients: string[];
   instructions: string[];
   likes: number;
