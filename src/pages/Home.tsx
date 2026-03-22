@@ -114,6 +114,65 @@ const Home: FC = () => {
     <div className="min-h-screen bg-primary-light">
       <HeroSection />
 
+      <TrendingSection recipes={trendingRecipes} />
+
+      <section id="all-recipes" className="py-12 bg-white">
+        <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <div className="mb-8">
+            <h2 className="mb-2 text-2xl font-bold text-gray-800 sm:text-3xl">
+              All Recipes
+            </h2>
+            <p className="text-sm text-gray-600">
+              Browse our complete collection or use filters to find exactly what
+              you're looking for
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-8 lg:flex-row">
+            <FilterSidebar
+              selectedFilters={selectedFilters}
+              onFilterChange={setSelectedFilters}
+              recipeCount={recipes.length}
+            />
+
+            <div className="flex-1">
+              {/* ERROR STATE */}
+              {error && (
+                <div className="flex items-center justify-center p-8 border border-red-200 rounded-lg bg-red-50">
+                  <p className="text-red-600">{error}</p>
+                </div>
+              )}
+
+              {/* LOADING STATE */}
+              {isLoading && !error && (
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="overflow-hidden bg-white border border-gray-200 rounded-xl animate-pulse"
+                    >
+                      <div className="w-full h-48 bg-gray-200" />
+                      <div className="p-4 space-y-3">
+                        <div className="w-3/4 h-4 bg-gray-200 rounded" />
+                        <div className="w-full h-3 bg-gray-100 rounded" />
+                        <div className="w-1/2 h-3 bg-gray-100 rounded" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* RECIPES */}
+              {!isLoading && !error && (
+                <RecipeGrid
+                  recipes={recipes}
+                  emptyMessage="No recipes match your filters. Try adjusting your selections."
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };
