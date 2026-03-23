@@ -13,9 +13,6 @@ import FilterSidebar, {
 } from "../components/recipe/FilterSidebar";
 import RecipeGrid from "../components/recipe/RecipeGrid";
 
-// true  = mock data (no API calls, develop freely)
-// false = real Spoonacular API (only when testing final result)
-const USE_MOCK = true;
 // ──────────────────────────────────────────────────────────────
 
 const Home: FC = () => {
@@ -23,7 +20,18 @@ const Home: FC = () => {
     mealType: [],
     cuisine: [],
     diet: [],
-    healthGoals: [],
+    healthGoals: [] as const as Array<
+      | "Heart Healthy"
+      | "Diabetic Friendly"
+      | "High Protein"
+      | "Low Sodium"
+      | "Low Carb"
+      | "Anti-Inflammatory"
+      | "Gut Friendly"
+      | "Weight Management"
+      | "Kidney Friendly"
+      | "Immune Boosting"
+    >,
   });
 
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -34,22 +42,16 @@ const Home: FC = () => {
   // ─── EFFECT 1: TRENDING ───────────────────────────────────────
   useEffect(() => {
     const loadTrending = async () => {
-      // MOCK PATH — instant, no API call
-      if (USE_MOCK) {
-        setTrendingRecipes(mockRecipes.slice(0, 4));
-        return;
-      }
-
-      // REAL API PATH
       try {
         const data = await fetchTrendingRecipes();
-        setTrendingRecipes(data);
+        console.log("TRENDING DATA:", data);
+        console.log("TRENDING LENGTH:", data.length);
+        setTrendingRecipes(data.length > 0 ? data : mockRecipes.slice(0, 4));
       } catch (err) {
-        console.error("Could not load trending:", err);
-        setError("Failed to load trending recipes. Please try again later.");
+        setTrendingRecipes(mockRecipes.slice(0, 4));
+        console.error("Trending fallback to mock:", err);
       }
     };
-
     loadTrending();
   }, []);
 
@@ -59,36 +61,6 @@ const Home: FC = () => {
       setIsLoading(true);
       setError(null);
 
-      // MOCK PATH — filter locally, no API call
-      if (USE_MOCK) {
-        const filtered = mockRecipes.filter((r) => {
-          const matchMeal =
-            selectedFilters.mealType.length === 0 ||
-            selectedFilters.mealType.includes(r.mealType);
-
-          const matchCuisine =
-            selectedFilters.cuisine.length === 0 ||
-            selectedFilters.cuisine.includes(r.cuisine);
-
-          const matchDiet =
-            selectedFilters.diet.length === 0 ||
-            selectedFilters.diet.some((d) => r.diet.includes(d));
-
-          const matchGoals =
-            selectedFilters.healthGoals.length === 0 ||
-            selectedFilters.healthGoals.some((g) =>
-              r.healthGoals?.includes(g as any),
-            );
-
-          return matchMeal && matchCuisine && matchDiet && matchGoals;
-        });
-
-        setRecipes(filtered);
-        setIsLoading(false);
-        return; // stop here — don't call API
-      }
-
-      // REAL API PATH
       try {
         const data = await fetchRecipes(
           "healthy",
@@ -97,18 +69,41 @@ const Home: FC = () => {
           selectedFilters.cuisine[0] ?? "",
           selectedFilters.diet[0] ?? "",
         );
-        setRecipes(data); //saves data
+
+        if (data.length > 0) {
+          // Real API data came back — use it
+          setRecipes(data);
+        } else {
+          // API returned empty — limit hit, fall back to mock
+          const filtered = mockRecipes.filter((r) => {
+            const matchMeal =
+              selectedFilters.mealType.length === 0 ||
+              selectedFilters.mealType.includes(r.mealType);
+            const matchCuisine =
+              selectedFilters.cuisine.length === 0 ||
+              selectedFilters.cuisine.includes(r.cuisine);
+            const matchDiet =
+              selectedFilters.diet.length === 0 ||
+              selectedFilters.diet.some((d) => r.diet.includes(d));
+            const matchGoals =
+              selectedFilters.healthGoals.length === 0 ||
+              selectedFilters.healthGoals.some((g: string) =>
+                r.healthGoals?.includes(g as any),
+              );
+            return matchMeal && matchCuisine && matchDiet && matchGoals;
+          });
+          setRecipes(filtered);
+        }
       } catch (err) {
-        setError("Could not load recipes. Please try again.");
         console.error(err);
+        setRecipes(mockRecipes);
       } finally {
         setIsLoading(false);
       }
     }, 500);
 
-    return () => clearTimeout(timer); //Cancels previous request if user clicks fast
+    return () => clearTimeout(timer);
   }, [selectedFilters]);
-
   // ─── RENDER ───────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-primary-light">
