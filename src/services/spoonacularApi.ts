@@ -28,47 +28,47 @@ interface SpoonacularListResponse {
 // ─── PART 3: MAPPINGS ───────────────
 
 const healthGoalToDiet: Record<string, string> = {
-  "Heart Healthy":     "heart healthy",
+  "Heart Healthy": "heart healthy",
   "Diabetic Friendly": "diabetic",
-  "High Protein":      "high protein",
-  "Low Sodium":        "low sodium",
-  "Low Carb":          "low carb",
+  "High Protein": "high protein",
+  "Low Sodium": "low sodium",
+  "Low Carb": "low carb",
   "Anti-Inflammatory": "anti inflammatory",
-  "Gut Friendly":      "fodmap friendly",
+  "Gut Friendly": "fodmap friendly",
   "Weight Management": "whole30",
-  "Kidney Friendly":   "low potassium",
-  "Immune Boosting":   "immune supporting",
+  "Kidney Friendly": "low potassium",
+  "Immune Boosting": "immune supporting",
 };
 
 const dishTypeToMealType: Record<string, Recipe["mealType"]> = {
   "morning meal": "Breakfast",
-  "brunch":       "Breakfast",
-  "breakfast":    "Breakfast",
-  "lunch":        "Lunch",
-  "salad":        "Lunch",
-  "soup":         "Lunch",
-  "main course":  "Dinner",
-  "main dish":    "Dinner",
-  "dinner":       "Dinner",
-  "side dish":    "Dinner",
-  "antipasti":    "Dinner",
-  "starter":      "Dinner",
-  "appetizer":    "Dinner",
-  "snack":        "Snacks",
-  "fingerfood":   "Snacks",
-  "dessert":      "Dessert",
-  "beverage":     "Drinks",
-  "drink":        "Drinks",
-  "cocktail":     "Drinks",
+  brunch: "Breakfast",
+  breakfast: "Breakfast",
+  lunch: "Lunch",
+  salad: "Lunch",
+  soup: "Lunch",
+  "main course": "Dinner",
+  "main dish": "Dinner",
+  dinner: "Dinner",
+  "side dish": "Dinner",
+  antipasti: "Dinner",
+  starter: "Dinner",
+  appetizer: "Dinner",
+  snack: "Snacks",
+  fingerfood: "Snacks",
+  dessert: "Dessert",
+  beverage: "Drinks",
+  drink: "Drinks",
+  cocktail: "Drinks",
 };
 
 const mealTypeToApiType: Record<string, string> = {
-  "Breakfast": "morning meal",
-  "Lunch":     "lunch",
-  "Dinner":    "main course",
-  "Snacks":    "snack",
-  "Dessert":   "dessert",
-  "Drinks":    "beverage",
+  Breakfast: "morning meal",
+  Lunch: "lunch",
+  Dinner: "main course",
+  Snacks: "snack",
+  Dessert: "dessert",
+  Drinks: "beverage",
 };
 
 // ─── PART 4: CONVERTER ────────────────────────────────────────
@@ -88,16 +88,17 @@ function toRecipe(s: SpoonacularRecipe): Recipe {
         : (s.readyInMinutes ?? 30) <= 45
           ? "Medium"
           : "Hard",
-    cuisine:  s.cuisines?.[0] ?? "International",
+    cuisine: s.cuisines?.[0] ?? "International",
     mealType: dishTypeToMealType[s.dishTypes?.[0] ?? ""] ?? "Dinner",
-    diet: (s.diets ?? []).map(
-      (d) => d.charAt(0).toUpperCase() + d.slice(1)
-    ),
+    diet: (s.diets ?? []).map((d) => d.charAt(0).toUpperCase() + d.slice(1)),
     ingredients: (s.extendedIngredients ?? []).map((i) => i.original),
     instructions: s.instructions
-      ? s.instructions.replace(/<[^>]*>/g, "").split(". ").filter(Boolean)
+      ? s.instructions
+          .replace(/<[^>]*>/g, "")
+          .split(". ")
+          .filter(Boolean)
       : ["See full recipe for instructions."],
-    likes:   s.aggregateLikes ?? 0,
+    likes: s.aggregateLikes ?? 0,
     isLiked: false,
     isSaved: false,
   };
@@ -114,7 +115,7 @@ export async function fetchRecipes(
 ): Promise<Recipe[]> {
   const url = new URL(`${BASE_URL}/recipes/complexSearch`);
   url.searchParams.set("query", query);
-  url.searchParams.set("number", "20");
+  url.searchParams.set("number", "8");
   url.searchParams.set("addRecipeInformation", "true");
   url.searchParams.set("apiKey", API_KEY);
 
@@ -125,7 +126,7 @@ export async function fetchRecipes(
   }
 
   if (cuisine) url.searchParams.set("cuisine", cuisine.toLowerCase());
-  if (diet)    url.searchParams.set("diet", diet.toLowerCase());
+  if (diet) url.searchParams.set("diet", diet.toLowerCase());
 
   const goalTag = healthGoals
     .map((g) => healthGoalToDiet[g])
@@ -154,7 +155,7 @@ export async function fetchRecipes(
 
 export async function fetchTrendingRecipes(): Promise<Recipe[]> {
   const url = new URL(`${BASE_URL}/recipes/complexSearch`);
-  url.searchParams.set("query", "popular");   // Bug 2 fix — "query" not "queue"
+  url.searchParams.set("query", "popular");
   url.searchParams.set("sort", "popularity");
   url.searchParams.set("number", "4");
   url.searchParams.set("addRecipeInformation", "true");
