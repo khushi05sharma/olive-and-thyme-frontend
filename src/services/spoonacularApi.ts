@@ -155,7 +155,10 @@ export async function fetchRecipes(
 
 export async function fetchTrendingRecipes(): Promise<Recipe[]> {
   const url = new URL(`${BASE_URL}/recipes/complexSearch`);
-  url.searchParams.set("query", "popular");
+  
+  // FIXED — "popular" is not a food keyword, returns empty
+  // Use broad term so API has many recipes to sort by popularity
+  url.searchParams.set("query", "chicken");
   url.searchParams.set("sort", "popularity");
   url.searchParams.set("number", "4");
   url.searchParams.set("addRecipeInformation", "true");

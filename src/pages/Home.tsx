@@ -1,11 +1,13 @@
 import { type FC, useState, useEffect } from "react";
 
-// Mock data — used when USE_MOCK is true
+// ─── IMPORTS ──────────────────────────────────────────────────
 import { mockRecipes } from "../data/mockRecipes";
 import { fetchRecipes, fetchTrendingRecipes } from "../services/spoonacularApi";
 import { type Recipe } from "../types/recipe";
 
-// Components
+// NEW — for reading URL search param
+import { useSearchParams, useNavigate } from "react-router-dom";
+
 import HeroSection from "../components/home/HeroSection";
 import TrendingSection from "../components/home/TrendingSection";
 import FilterSidebar, {
@@ -13,49 +15,66 @@ import FilterSidebar, {
 } from "../components/recipe/FilterSidebar";
 import RecipeGrid from "../components/recipe/RecipeGrid";
 
-// ──────────────────────────────────────────────────────────────
-
 const Home: FC = () => {
+  // ─── FILTER STATE ─────────────────────────────────────────────
   const [selectedFilters, setSelectedFilters] = useState<FilterState>({
     mealType: [],
     cuisine: [],
     diet: [],
-    healthGoals: [] as const as Array<
-      | "Heart Healthy"
-      | "Diabetic Friendly"
-      | "High Protein"
-      | "Low Sodium"
-      | "Low Carb"
-      | "Anti-Inflammatory"
-      | "Gut Friendly"
-      | "Weight Management"
-      | "Kidney Friendly"
-      | "Immune Boosting"
-    >,
+    healthGoals: [], // CLEANED — removed unnecessary type annotation
   });
 
+  // ─── RECIPE STATE ─────────────────────────────────────────────
   const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [trendingRecipes, setTrendingRecipes] = useState<Recipe[]>([]);
+
+  // FIXED — initialise with mock so TrendingSection is never empty on first render
+  // Once API responds, this gets replaced with real data automatically
+  const [trendingRecipes, setTrendingRecipes] = useState<Recipe[]>(
+    mockRecipes.slice(0, 4),
+  );
+
+  // NEW — tracks if trending is still loading from API
+  const [isTrendingLoading, setIsTrendingLoading] = useState(true);
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // ─── SEARCH PARAMS ────────────────────────────────────────────
+  // NEW — reads /?search=pasta from URL
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const searchQuery = searchParams.get("search") ?? "";
 
   // ─── EFFECT 1: TRENDING ───────────────────────────────────────
   useEffect(() => {
     const loadTrending = async () => {
+      setIsTrendingLoading(true);
+
       try {
         const data = await fetchTrendingRecipes();
-        console.log("TRENDING DATA:", data);
-        console.log("TRENDING LENGTH:", data.length);
-        setTrendingRecipes(data.length > 0 ? data : mockRecipes.slice(0, 4));
+        console.log("=== TRENDING DEBUG ===");
+        console.log("data received:", data);
+        console.log("data length:", data.length);
+        console.log("data[0]:", data[0]); // see first recipe if any
+
+        if (data.length > 0) {
+          setTrendingRecipes(data);
+          console.log("SET REAL TRENDING DATA");
+        } else {
+          console.log("EMPTY — staying on mock");
+        }
       } catch (err) {
-        setTrendingRecipes(mockRecipes.slice(0, 4));
-        console.error("Trending fallback to mock:", err);
+        console.error("TRENDING ERROR:", err);
+      } finally {
+        setIsTrendingLoading(false);
       }
     };
+
     loadTrending();
   }, []);
 
   // ─── EFFECT 2: ALL RECIPES with debounce ──────────────────────
+  // UPDATED — now also watches searchQuery so search triggers a fetch
   useEffect(() => {
     const timer = setTimeout(async () => {
       setIsLoading(true);
@@ -63,7 +82,7 @@ const Home: FC = () => {
 
       try {
         const data = await fetchRecipes(
-          "healthy",
+          searchQuery || "healthy", // CHANGED — use search query, fallback to "healthy"
           selectedFilters.healthGoals,
           selectedFilters.mealType[0] ?? "",
           selectedFilters.cuisine[0] ?? "",
@@ -71,10 +90,9 @@ const Home: FC = () => {
         );
 
         if (data.length > 0) {
-          // Real API data came back — use it
           setRecipes(data);
         } else {
-          // API returned empty — limit hit, fall back to mock
+          // API limit hit — fall back to mock with local filtering
           const filtered = mockRecipes.filter((r) => {
             const matchMeal =
               selectedFilters.mealType.length === 0 ||
@@ -100,16 +118,21 @@ const Home: FC = () => {
       } finally {
         setIsLoading(false);
       }
-    }, 500);
+    }, 500); // 500ms debounce for filters
 
     return () => clearTimeout(timer);
-  }, [selectedFilters]);
+  }, [selectedFilters, searchQuery]); // UPDATED — searchQuery added as dependency
+
   // ─── RENDER ───────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-primary-light">
       <HeroSection />
 
-      <TrendingSection recipes={trendingRecipes} />
+      {/* UPDATED — pass isLoading so TrendingSection shows skeleton */}
+      <TrendingSection
+        recipes={trendingRecipes}
+        isLoading={isTrendingLoading}
+      />
 
       <section id="all-recipes" className="py-12 bg-white">
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -123,6 +146,22 @@ const Home: FC = () => {
             </p>
           </div>
 
+          {/* NEW — search indicator banner */}
+          {searchQuery && (
+            <div className="p-3 mb-6 text-sm border border-orange-200 rounded-lg bg-orange-50">
+              <span className="text-orange-700">
+                Showing results for: <strong>"{searchQuery}"</strong>
+              </span>
+              {/* Clear button navigates back to home with no search param */}
+              <button
+                onClick={() => navigate("/")}
+                className="ml-2 text-orange-500 underline hover:text-orange-700"
+              >
+                Clear search
+              </button>
+            </div>
+          )}
+
           <div className="flex flex-col gap-8 lg:flex-row">
             <FilterSidebar
               selectedFilters={selectedFilters}
@@ -131,14 +170,12 @@ const Home: FC = () => {
             />
 
             <div className="flex-1">
-              {/* ERROR STATE */}
               {error && (
                 <div className="flex items-center justify-center p-8 border border-red-200 rounded-lg bg-red-50">
                   <p className="text-red-600">{error}</p>
                 </div>
               )}
 
-              {/* LOADING STATE */}
               {isLoading && !error && (
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {Array.from({ length: 6 }).map((_, i) => (
@@ -157,7 +194,6 @@ const Home: FC = () => {
                 </div>
               )}
 
-              {/* RECIPES */}
               {!isLoading && !error && (
                 <RecipeGrid
                   recipes={recipes}

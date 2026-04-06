@@ -1,5 +1,5 @@
 import { type FC, useState, useRef, useEffect } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import {
   Home,
   Plus,
@@ -30,11 +30,16 @@ const Navbar: FC = () => {
   {
     /* this do true to check after login navbar and false for login signup one */
   }
+
+  // search state and debounce timer ref
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const navigate = useNavigate(); // for navigating to /?search=...
+
   const isLoggedIn: boolean = true;
 
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
   const closeMenu = () => setIsMenuOpen(false);
-
   const toggleProfile = () => setIsProfileOpen((prev) => !prev);
   const closeProfile = () => setIsProfileOpen(false);
 
@@ -44,6 +49,29 @@ const Navbar: FC = () => {
       setMenuHeight(menuRef.current.scrollHeight);
     }
   }, [isMenuOpen, isLoggedIn]); // Added isLoggedIn so height recalculates when state changes
+
+  // handles search input with 800ms debounce
+  // 800ms because typing a full phrase like "white sauce pasta" takes time
+  // Without debounce, every keystroke = 1 API call = limit gone fast
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value); // update input immediately so it feels responsive
+
+    // Cancel any previous pending timer
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+
+    // If user cleared the box — go back to normal home
+    if (!value.trim()) {
+      navigate("/");
+      return;
+    }
+
+    // Wait 800ms after last keystroke, then navigate with search param
+    searchTimerRef.current = setTimeout(() => {
+      navigate(`/?search=${encodeURIComponent(value.trim())}`);
+    }, 800);
+  };
 
   // Active / inactive nav styles
   const navLinkClasses = ({ isActive }: { isActive: boolean }) =>
@@ -94,6 +122,8 @@ const Navbar: FC = () => {
               />
               <input
                 type="text"
+                value={searchQuery}
+                onChange={handleSearchChange}
                 placeholder="Search for recipes..."
                 className="w-full py-2 pl-10 pr-4 border border-orange-400 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               />
@@ -242,6 +272,8 @@ const Navbar: FC = () => {
             />
             <input
               type="text"
+              value={searchQuery} 
+              onChange={handleSearchChange}
               placeholder="Search recipes..."
               className="w-full py-2 pl-10 pr-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary"
             />
