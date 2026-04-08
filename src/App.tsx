@@ -14,6 +14,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import RecipeDetail from "./pages/RecipeDetail";
 
+
 function App() {
   return (
     <BrowserRouter>
@@ -31,6 +32,7 @@ function App() {
         <Route path="/test-card" element={<TestRecipeCard />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        
       </Routes>
       </Layout>
     </BrowserRouter>

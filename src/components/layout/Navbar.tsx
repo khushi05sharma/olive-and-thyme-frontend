@@ -36,7 +36,7 @@ const Navbar: FC = () => {
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const navigate = useNavigate(); // for navigating to /?search=...
 
-  const isLoggedIn: boolean = true;
+  const isLoggedIn: boolean = false;
 
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
   const closeMenu = () => setIsMenuOpen(false);
