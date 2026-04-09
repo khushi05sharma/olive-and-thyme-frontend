@@ -1,16 +1,16 @@
 const API_URL = "https://localhost:5000/api/auth";
 
 // what a user looks like when returned from backend
-export interface authUser {
+export interface AuthUser {
   id: string;
   name: string;
   email: string;
 }
 
 // what backend returns on signup/login
-export interface authResponse {
+export interface AuthResponse {
   token: string;
-  user: authUser;
+  user: AuthUser;
 }
 
 // ----- SIGNUP --------
@@ -21,7 +21,7 @@ export async function signupApi(
   name: string,
   email: string,
   password: string,
-): Promise<authResponse> {
+): Promise<AuthResponse> {
   const response = await fetch(`${API_URL}/signup`, {
     method: "POST",
     headers: {
@@ -46,7 +46,7 @@ export async function signupApi(
 export async function loginApi(
   email: string,
   password: string,
-): Promise<authResponse> {
+): Promise<AuthResponse> {
   const response = await fetch(`${API_URL}/login`, {
     method: "POST",
     headers: {
@@ -68,7 +68,7 @@ export async function loginApi(
 // calls GET /api/auth/me
 // used on app load to check if saved token is still valid
 
-export async function getMeApi(token: string): Promise<authUser> {
+export async function getMeApi(token: string): Promise<AuthUser> {
   const response = await fetch(`${API_URL}/me`, {
     method: "GET",
     headers: {
