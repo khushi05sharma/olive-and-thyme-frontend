@@ -63,3 +63,24 @@ export async function loginApi(
 
   return data; // { token, user }
 }
+
+// ----- GET CURRENT USER -------
+// calls GET /api/auth/me
+// used on app load to check if saved token is still valid
+
+export async function getMeApi(token: string): Promise<authUser> {
+  const response = await fetch(`${API_URL}/me`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`, // send token in header
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "session expired, please log in again");
+  }
+
+  return data; // { id, name, email }
+}
