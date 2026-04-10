@@ -1,5 +1,7 @@
 import { type FC, useState, type FormEvent, type ChangeEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { loginApi } from "../services/authApi";
+import { useAuth } from "../context/AuthContext";
 import Button from "../components/common/Button";
 import Input from "../components/common/Input";
 import logo from "../assets/logo.png";
@@ -7,6 +9,9 @@ import { LogIn, Mail, Lock, Eye, EyeOff } from "lucide-react";
 
 const Login: FC = () => {
   const navigate = useNavigate();
+
+  // get login function from AuthContext
+  const { login } = useAuth();
 
   // STATE
   const [formData, setFormData] = useState({
@@ -17,15 +22,18 @@ const Login: FC = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [serverError, setServerError] = useState("");
 
   //HANDLERS
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-    // Clear error for this field
+    // clear error for this field
     if (errors[name]) {
       setErrors({ ...errors, [name]: "" });
+      // clear server error when user starts typing again
+      if (serverError) setServerError("");
     }
   };
 
@@ -55,24 +63,19 @@ const Login: FC = () => {
 
     if (!validateForm()) return;
     setIsSubmitting(true);
+    setServerError("");
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    // Phase 1: Just simulate successful login
-    // Phase 3: POST /api/auth/login
-    // const response = await fetch('/api/auth/login', {
-    //   method: 'POST',
-    //   body: JSON.stringify(formData)
-    // });
-    // const { token, user } = await response.json();
-    // Store token in localStorage
-    // Update AuthContext
-
-    setIsSubmitting(false);
-    // Show success and redirect
-    alert("Login successful!");
-    navigate("/");
+    //real api call
+    try {
+      const { token, user } = await loginApi(formData.email, formData.password);
+      // save token + user in AuthContext + localStorage
+      login(token, user);
+      navigate("/");
+    } catch (error: any) {
+      setServerError(error.message || "Login failed. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // RENDER
@@ -100,6 +103,12 @@ const Login: FC = () => {
         {/* Login Form */}
 
         <div className="w-full p-5 bg-white shadow-lg sm:p-6 md:p-8 rounded-xl">
+          {/* server error */}
+          {serverError && (
+            <div className="p-3 mb-4 text-sm text-red-700 border border-red-200 rounded-lg bg-red-50">
+              {serverError}
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
             {/* email input*/}
             <Input
