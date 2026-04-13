@@ -6,15 +6,23 @@ import {
   type FC,
   type ReactNode,
 } from "react";
-import { type AuthUser, getMeApi } from "../services/authApi";
+import {
+  type AuthUser,
+  getMeApi,
+  getInteractionsApi,
+} from "../services/authApi";
 
 export interface AuthContextType {
   user: AuthUser | null;
   token: string | null;
   isLoggedIn: boolean;
   isLoading: boolean;
+  likedRecipes: string[];
+  savedRecipes: string[];
   login: (token: string, user: AuthUser) => void;
   logout: () => void;
+  setLikedRecipes: (ids: string[]) => void;
+  setSavedRecipes: (ids: string[]) => void;
 }
 
 // what we store in context about the user here undefined until we log in or restore login
@@ -31,6 +39,8 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [likedRecipes, setLikedRecipes] = useState<string[]>([]);
+  const [savedRecipes, setSavedRecipes] = useState<string[]>([]);
 
   // ---- ON APP LOAD ---
   // when app starts, check if user was previously logged in
@@ -50,6 +60,9 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         const savedUser = await getMeApi(savedToken);
         setUser(savedUser);
         setToken(savedToken);
+        const interactions = await getInteractionsApi(savedToken);
+        setLikedRecipes(interactions.likedRecipes);
+        setSavedRecipes(interactions.savedRecipes);
         console.log(`[Auth] restored login for ${savedUser.email}`);
       } catch (error) {
         localStorage.removeItem("olive_token");
@@ -75,6 +88,8 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem("olive_token");
     setToken(null);
     setUser(null);
+    setLikedRecipes([]);
+    setSavedRecipes([]);
     console.log("[AUTH] Logged out");
   };
 
@@ -85,8 +100,12 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         token,
         isLoggedIn: !!user, // !! converts user object to true, null to false
         isLoading,
+        likedRecipes,
+        savedRecipes,
         login,
         logout,
+        setLikedRecipes,
+        setSavedRecipes,
       }}
     >
       {/* while checking saved login - show nothing to avoid flash */}
