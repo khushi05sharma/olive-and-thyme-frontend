@@ -1,4 +1,4 @@
-const API_URL = "https://localhost:5000/api/auth";
+const API_URL = "http://localhost:5000/api/auth";
 
 // what a user looks like when returned from backend
 export interface AuthUser {

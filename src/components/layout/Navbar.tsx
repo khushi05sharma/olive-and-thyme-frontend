@@ -1,5 +1,6 @@
 import { type FC, useState, useRef, useEffect } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import {
   Home,
   Plus,
@@ -24,19 +25,16 @@ const Navbar: FC = () => {
   const menuRef = useRef<HTMLDivElement>(null);
   const [menuHeight, setMenuHeight] = useState<number>(0);
 
-  // CHANGE THIS to true or false to test both navbar states
-  // Later this will come from AuthContext: const { isLoggedIn } = useAuth();
-
-  {
-    /* this do true to check after login navbar and false for login signup one */
-  }
-
   // search state and debounce timer ref
   const [searchQuery, setSearchQuery] = useState<string>("");
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const navigate = useNavigate(); // for navigating to /?search=...
 
-  const isLoggedIn: boolean = false;
+  const { isLoggedIn, user, logout, isLoading } = useAuth();
+
+  const avatarLetter = isLoading
+    ? "..."
+    : (user?.name?.charAt(0).toUpperCase() ?? "U");
 
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
   const closeMenu = () => setIsMenuOpen(false);
@@ -168,7 +166,7 @@ const Navbar: FC = () => {
                     onClick={toggleProfile}
                     className="flex items-center justify-center w-10 h-10 font-bold text-white transition rounded-full bg-primary hover:bg-orange-600"
                   >
-                    S
+                    {avatarLetter}
                   </button>
 
                   {isProfileOpen && (
@@ -190,7 +188,11 @@ const Navbar: FC = () => {
                       </Link>
 
                       <button
-                        onClick={closeProfile}
+                        onClick={() => {
+                          logout();
+                          closeProfile();
+                          navigate("/");
+                        }}
                         className="flex items-center w-full gap-3 px-4 py-2 text-left text-red-600 hover:bg-red-50"
                       >
                         <LogOut size={18} /> Logout
@@ -272,7 +274,7 @@ const Navbar: FC = () => {
             />
             <input
               type="text"
-              value={searchQuery} 
+              value={searchQuery}
               onChange={handleSearchChange}
               placeholder="Search recipes..."
               className="w-full py-2 pl-10 pr-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary"
@@ -311,7 +313,11 @@ const Navbar: FC = () => {
 
               {/* Logout */}
               <button
-                onClick={closeMenu}
+                onClick={() => {
+                  logout();
+                  closeProfile();
+                  navigate("/");
+                }}
                 className="flex items-center w-full gap-3 px-3 py-2 pt-3 text-left text-red-600 transition border-t border-gray-200 rounded-lg hover:bg-red-50"
               >
                 <LogOut size={20} /> Logout

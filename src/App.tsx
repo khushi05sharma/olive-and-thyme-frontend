@@ -1,5 +1,5 @@
 // Import routing components from react-router-dom
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import {Route, Routes } from "react-router-dom";
 
 import Layout from "./components/layout/Layout";
 import TestComponents from "./pages/TestComponents";
@@ -18,8 +18,7 @@ import ResetPassword from "./pages/ResetPassword";
 
 function App() {
   return (
-    <BrowserRouter>
-      {/* React Router will match the current URL to ONE of these routes */}
+    
       <Layout>
         <Routes>
           {/* element prop specifies which component to render */}
@@ -37,7 +36,7 @@ function App() {
           <Route path="/reset-password/:token" element={<ResetPassword />} />
         </Routes>
       </Layout>
-    </BrowserRouter>
+  
   );
 }
 

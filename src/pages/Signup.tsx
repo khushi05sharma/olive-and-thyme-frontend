@@ -5,9 +5,13 @@ import { UserPlus, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import Button from "../components/common/Button";
 import Input from "../components/common/Input";
 import logo from "../assets/logo.png";
+import { useAuth } from "../context/AuthContext";
+import { signupApi } from "../services/authApi";
 
 const Signup: FC = () => {
   const navigate = useNavigate();
+
+  const { login } = useAuth();
 
   //STATE
 
@@ -22,6 +26,7 @@ const Signup: FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [serverError, setServerError] = useState("");
 
   //HANDLERS
 
@@ -31,6 +36,7 @@ const Signup: FC = () => {
     // Clear error for this field
     if (errors[name]) {
       setErrors({ ...errors, [name]: "" });
+      if (serverError) setServerError("");
     }
   };
 
@@ -74,28 +80,22 @@ const Signup: FC = () => {
 
     if (!validateForm()) return;
     setIsSubmitting(true);
+    setServerError("");
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    // Phase 1: Just simulate successful signup
-    // Phase 3: POST /api/auth/signup
-    // const response = await fetch('/api/auth/signup', {
-    //   method: 'POST',
-    //   body: JSON.stringify({
-    //     name: formData.name,
-    //     email: formData.email,
-    //     password: formData.password
-    //   })
-    // });
-    // const { token, user } = await response.json();
-    // Store token, update AuthContext
-
-    setIsSubmitting(false);
-
-    // Show success and redirect
-    alert("Account created successfully!");
-    navigate("/");
+    try {
+      const { token, user } = await signupApi(
+        formData.name,
+        formData.email,
+        formData.password,
+      );
+      // log user in immediately after signup
+      login(token, user);
+      navigate("/");
+    } catch (error: any) {
+      setServerError(error.message || "Signup failed. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   //RENDER
@@ -116,6 +116,12 @@ const Signup: FC = () => {
 
         {/* Signup Form */}
         <div className="p-8 bg-white shadow-lg rounded-xl">
+          {/* Server Error */}
+          {serverError && (
+            <div className="p-3 mb-4 text-sm text-red-700 border border-red-200 rounded-lg bg-red-50">
+              {serverError}
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Name Input */}
             <Input
