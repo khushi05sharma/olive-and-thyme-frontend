@@ -84,3 +84,43 @@ export async function getMeApi(token: string): Promise<AuthUser> {
 
   return data; // { id, name, email }
 }
+
+// --- Like Recipe ---
+
+export async function likeRecipeApi(
+  token: string,
+  recipeId: string,
+): Promise<{ liked: boolean; likedRecipes: string[] }> {
+  const response = await fetch(
+    `http://localhost:5000/api/users/like/${recipeId}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "Failed to like recipe");
+  return data;
+}
+
+// ---- Saved Recipes ----
+
+export async function savedRecipeApi(
+  token: string,
+  recipeId: string,
+): Promise<{ saved: boolean; savedRecipes: string[] }> {
+  const response = await fetch(
+    `http://localhost:5000/api/users/save/${recipeId}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "Failed to save recipe");
+  return data;
+}
