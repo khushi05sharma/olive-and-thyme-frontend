@@ -20,10 +20,21 @@ import { type Comment } from "../types/comment";
 import Badge from "../components/common/Badge";
 import Button from "../components/common/Button";
 import RecipeImage from "../components/common/RecipeImage";
+import { useAuth } from "../context/AuthContext";
+import { likeRecipeApi, savedRecipeApi } from "../services/authApi";
 
 const RecipeDetail: FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+
+  const {
+    isLoggedIn,
+    token,
+    likedRecipes,
+    savedRecipes,
+    setLikedRecipes,
+    setSavedRecipes,
+  } = useAuth();
 
   // ---- STATE ----------
   const [recipe, setRecipe] = useState<Recipe | null>(null);
@@ -39,42 +50,45 @@ const RecipeDetail: FC = () => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
 
-  // ------- EFFECT 1: FETCH RECIPE -------
-  const loadRecipe = async () => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      // Always try real API first
-      const data = await fetchRecipeById(id!);
-      setRecipe(data);
-      setIsLiked(data.isLiked ?? false);
-      setIsSaved(data.isSaved ?? false);
-      setLikeCount(data.likes);
-    } catch (err) {
-      // API failed (limit or not found) — try mock as fallback
-      const found = mockRecipes.find((r) => r.id === id);
-      if (found) {
-        setRecipe(found);
-        setIsLiked(found.isLiked ?? false);
-        setIsSaved(found.isSaved ?? false);
-        setLikeCount(found.likes);
-      } else {
-        // Not in mock either — genuine 404
-        setError("Could not load this recipe. Please try again.");
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // ----- EFFECT 1: LOAD RECIPE --------
 
   useEffect(() => {
-    if (id) {
-      loadRecipe();
-    }
+    if (!id) return;
+
+    const loadRecipe = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const data = await fetchRecipeById(id);
+        setRecipe(data);
+        setLikeCount(data.likes);
+      } catch (error) {
+        const found = mockRecipes.find((r) => r.id === id);
+        if (found) {
+          setRecipe(found);
+          setLikeCount(found.likes);
+        } else {
+          setError("Failed to load recipe. Please try again later.");
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadRecipe();
+    window.scrollTo(0, 0);
   }, [id]);
 
-  // ------ EFFECT 2: LOAD COMMENTS --------
+  // ----- EFFECT 2: SYNC LIKE/SAVE STATE  --------
+
+  useEffect(() => {
+    if (recipe) {
+      setIsLiked(likedRecipes.includes(recipe.id));
+      setIsSaved(savedRecipes.includes(recipe.id));
+    }
+  }, [recipe, likedRecipes, savedRecipes]);
+
+  // ------ EFFECT 3: LOAD COMMENTS --------
   useEffect(() => {
     if (recipe) {
       // Phase 3: fetch(`/api/recipes/${recipe.id}/comments`)
@@ -82,14 +96,48 @@ const RecipeDetail: FC = () => {
     }
   }, [recipe]);
 
-  // --------- HANDLERS ---------
-  const handleLike = (): void => {
-    setIsLiked(!isLiked);
-    setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
+  // --------- HANDLER: LIKE ---------
+
+  const handleLike = async (): Promise<void> => {
+    if (!isLoggedIn || !token || !recipe) {
+      navigate("/Login");
+      return;
+    }
+
+    try {
+      const result = await likeRecipeApi(recipe.id, token);
+      // update local display state
+      setIsLiked(result.liked);
+      setLikeCount((prev) => (result.liked ? prev + 1 : prev - 1));
+
+      // update AuthContext so Dashboard saved count stays accurate
+      // and heart stays filled on other pages too
+      setLikedRecipes(result.likedRecipes);
+    } catch (error) {
+      console.error("[LIKE] Failed:", error);
+    }
   };
 
-  const handleSave = (): void => setIsSaved(!isSaved);
+  // --------- HANDLER: SAVE ---------
 
+  const handleSave = async (): Promise<void> => {
+    if (!isLoggedIn || !token || !recipe) {
+      navigate("/Login");
+      return;
+    }
+
+    try {
+      const result = await savedRecipeApi(recipe.id, token);
+      setIsSaved(result.saved);
+
+      // update AuthContext — Dashboard Saved count updates instantly
+      setSavedRecipes(result.savedRecipes);
+    } catch (error) {
+      console.error("[SAVE] Failed:", error);
+    }
+  };
+
+  // ---- HANDLER: SHARE ----
   const handleShare = async (): Promise<void> => {
     try {
       await navigator.clipboard.writeText(window.location.href);
@@ -99,6 +147,7 @@ const RecipeDetail: FC = () => {
     }
   };
 
+  // ---- HANDLER: TOGGLE INGREDIENT ----
   const toggleIngredient = (index: number): void => {
     setCheckedIngredients((prev) => {
       const newSet = new Set(prev);
@@ -106,6 +155,8 @@ const RecipeDetail: FC = () => {
       return newSet;
     });
   };
+
+  // ---- HANDLER: SUBMIT COMMENT ----
 
   const handleCommentSubmit = (e: React.FormEvent): void => {
     e.preventDefault();
@@ -210,6 +261,7 @@ const RecipeDetail: FC = () => {
           </h1>
           <p className="mb-6 text-gray-600">{recipe.description}</p>
           <div className="flex flex-wrap gap-3">
+            {/* LIKE BUTTON — filled when liked */}
             <Button
               variant={isLiked ? "primary" : "secondary"}
               onClick={handleLike}
@@ -218,6 +270,8 @@ const RecipeDetail: FC = () => {
               <Heart size={18} className={isLiked ? "fill-current" : ""} />
               {likeCount} Likes
             </Button>
+
+            {/* SAVE BUTTON — filled when saved */}
             <Button
               variant={isSaved ? "primary" : "secondary"}
               onClick={handleSave}
@@ -226,10 +280,21 @@ const RecipeDetail: FC = () => {
               <Bookmark size={18} className={isSaved ? "fill-current" : ""} />
               {isSaved ? "Saved" : "Save"}
             </Button>
+
             <Button variant="ghost" onClick={handleShare} className="gap-2">
               <Share2 size={18} /> Share
             </Button>
           </div>
+
+          {/* NEW — hint for non-logged-in users */}
+          {!isLoggedIn && (
+            <p className="mt-3 text-sm text-gray-500">
+              <Link to="/login" className="text-primary hover:underline">
+                Sign in
+              </Link>{" "}
+              to like and save recipes
+            </p>
+          )}
         </div>
 
         {/* QUICK INFO */}
@@ -348,10 +413,18 @@ const RecipeDetail: FC = () => {
                 type="text"
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Write a comment..."
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder={
+                  isLoggedIn ? "Write a comment..." : "Sign in to comment..."
+                }
+                disabled={!isLoggedIn}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-gray-50 disabled:text-gray-400"
               />
-              <Button type="submit" variant="primary" className="gap-2">
+              <Button
+                type="submit"
+                variant="primary"
+                className="gap-2"
+                disabled={!isLoggedIn}
+              >
                 <Send size={18} /> Post
               </Button>
             </div>
