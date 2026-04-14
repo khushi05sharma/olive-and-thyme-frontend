@@ -1,69 +1,79 @@
-import { type FC, useState, useMemo } from "react";
+import { type FC, useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChefHat, Heart, Bookmark, Plus, Edit, Trash2 } from "lucide-react";
 
-import { mockRecipes } from "../data/mockRecipes";
-import { mockCurrentUser, mockSavedRecipeIds } from "../data/mockUser";
-import { type DashboardTab, type UserStats } from "../types/user";
+import { useAuth } from "../context/AuthContext";
+import { fetchRecipeById } from "../services/spoonacularApi";
+import { type Recipe } from "../types/recipe";
+import { type DashboardTab } from "../types/user";
 import Button from "../components/common/Button";
 import RecipeCard from "../components/recipe/RecipeCard";
 
-// DASHBOARD PAGE
-
 const Dashboard: FC = () => {
-  const navigate = useNavigate();
+  const { user, likedRecipes, savedRecipes } = useAuth();
 
-  // STATE
-
-  // Active tab (my-recipes, saved, activity)
   const [activeTab, setActiveTab] = useState<DashboardTab>("my-recipes");
 
-  // User's recipes (can be deleted locally)
-  const [myRecipes, setMyRecipes] = useState(
-    mockRecipes.filter((r) => r.author?.id === mockCurrentUser.id),
-  );
+  // saved recipes fetched from Spoonacular using saved IDs
+  const [savedRecipeDetails, setSavedRecipeDetails] = useState<Recipe[]>([]);
+  const [isLoadingSaved, setIsLoadingSaved] = useState(false);
 
-  // DERIVED DATA
+  // My recipes — still mock for now (until Add Recipe saves to DB)
+  // Phase 3 later: fetch from GET /api/recipes/my
+  const myRecipes: Recipe[] = []; // empty until Add Recipe backend is done
 
-  // Current user (Phase 3: const { user } = useAuth();)
-  const currentUser = mockCurrentUser;
+  // ---- FETCH SAVED RECIPE DETAILS ----
+  // savedRecipes in AuthContext is just an array of IDs like ["1234, "5678"]
+  // We need to fetch full recipe details from Spoonacular for each ID
+  // Only fetch when user switches to Saved tab — saves API quota
 
-  // Saved recipes
-  const savedRecipes = mockRecipes.filter((r) =>
-    mockSavedRecipeIds.includes(r.id),
-  );
+  useEffect(() => {
+    const loadSavedRecipes = async () => {
+      if (savedRecipes.length === 0) {
+        setSavedRecipeDetails([]);
+        return;
+      }
 
-  // Calculate user stats
-  const userStats: UserStats = useMemo(() => {
-    const totalLikes = myRecipes.reduce((sum, recipe) => sum + recipe.likes, 0);
+      setIsLoadingSaved(true);
 
-    return {
-      recipesCount: myRecipes.length,
-      totalLikes,
-      savedCount: savedRecipes.length,
+      try {
+        const recipes = await Promise.all(
+          savedRecipes.map((id) => fetchRecipeById(id)),
+        );
+        setSavedRecipeDetails(recipes);
+      } catch (error) {
+        console.error("Failed to load saved recipes:", error);
+      } finally {
+        setIsLoadingSaved(false);
+      }
     };
-  }, [myRecipes, savedRecipes]);
 
-  // HANDLERS
+    if (activeTab === "saved") {
+      loadSavedRecipes();
+    }
+  }, [savedRecipes, activeTab]);
+
+  // ---- STATS -------
+  // totalLikes = likes received on my uploaded recipes
+
+  // (.reduce =  "take all items -> combine into ONE value")
+  // (and sum -> running total, r -> current recipe so it will add each recipe's likes to the total)
+  const totalLikes = myRecipes.reduce((sum, r) => sum + r.likes, 0);
+
+  // ----- HANDLERS ---
 
   const handleDeleteRecipe = (recipeId: string): void => {
     if (window.confirm("Are you sure you want to delete this recipe?")) {
-      // Phase 1: Remove from local state
-      setMyRecipes(myRecipes.filter((r) => r.id !== recipeId));
-
-      // Phase 3: Send DELETE request to backend
-      // await fetch(`/api/recipes/${recipeId}`, { method: 'DELETE' });
-      // then refetch: fetchMyRecipes();
+      console.log("Deleting recipe with ID:", recipeId);
     }
   };
 
   const handleEditRecipe = (recipeId: string): void => {
-    // Phase 3: Navigate to edit page
-    alert(`Edit functionality coming in Phase 3!\nRecipe ID: ${recipeId}`);
+    // Phase 3: navigate to edit page
+    alert(`Edit coming in Phase 3! Recipe ID: ${recipeId}`);
   };
 
-  // RENDER HELPER: Stat Card
-
+  // ---- STAT CARD --------
   const StatCard: FC<{
     icon: React.ReactNode;
     value: number;
@@ -81,8 +91,7 @@ const Dashboard: FC = () => {
     </div>
   );
 
-  // RENDER HELPER: Empty State
-
+  // ----- EMPTY STATE ----------
   const EmptyState: FC<{
     icon: string;
     title: string;
@@ -99,195 +108,4 @@ const Dashboard: FC = () => {
       )}
     </div>
   );
-
-  // RENDER HELPER: Recipe Card with Actions
-
-  const RecipeCardWithActions: FC<{ recipe: any }> = ({ recipe }) => (
-    <div className="relative group">
-      <RecipeCard recipe={recipe} />
-
-      {/* Action Buttons (visible on hover on desktop, always visible on mobile) */}
-      <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 sm:opacity-100 transition-opacity">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            handleEditRecipe(recipe.id);
-          }}
-          className="p-2 text-white rounded-full bg-blue-500 hover:bg-blue-600 transition shadow-lg"
-          aria-label="Edit recipe"
-        >
-          <Edit size={16} />
-        </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            handleDeleteRecipe(recipe.id);
-          }}
-          className="p-2 text-white rounded-full bg-red-500 hover:bg-red-600 transition shadow-lg"
-          aria-label="Delete recipe"
-        >
-          <Trash2 size={16} />
-        </button>
-      </div>
-    </div>
-  );
-
-  // RENDER
-
-  return (
-    <div className="min-h-screen bg-primary-light">
-      <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
-        {/* PROFILE HEADER */}
-        <div className="p-6 mb-8 bg-white rounded-lg shadow-sm sm:p-8">
-          <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
-            {/* user info */}
-            <div className="flex items-center gap-4">
-              {/* Avatar */}
-              <div className="flex items-center justify-center flex-shrink-0 w-20 h-20 text-3xl font-bold text-white rounded-full bg-primary">
-                {currentUser.name.charAt(0)}
-              </div>
-
-              {/* Name & Email */}
-              <div>
-                <h1 className="text-2xl font-bold text-gray-800">
-                  {currentUser.name}
-                </h1>
-                <p className="text-gray-600">{currentUser.email}</p>
-                {currentUser.createdAt && (
-                  <p className="text-sm text-gray-500">
-                    Member since {currentUser.createdAt}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* New Recipe Button */}
-            <Button
-              onClick={() => navigate("/add-recipe")}
-              variant="primary"
-              className="gap-2 whitespace-nowrap"
-            >
-              <Plus size={20} />
-              New Recipe
-            </Button>
-          </div>
-
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 gap-4 mt-6 sm:grid-cols-3">
-            <StatCard
-              icon={<ChefHat className="text-primary" />}
-              value={userStats.recipesCount}
-              label="Recipes"
-              color="bg-orange-50"
-            />
-            <StatCard
-              icon={<Heart className="text-red-500" />}
-              value={userStats.totalLikes}
-              label="Total Likes"
-              color="bg-red-50"
-            />
-            <StatCard
-              icon={<Bookmark className="text-blue-500" />}
-              value={userStats.savedCount}
-              label="Saved"
-              color="bg-blue-50"
-            />
-          </div>
-        </div>
-
-        {/* TAB NAVIGATION */}
-
-        <div className="mb-6">
-          <div className="flex gap-2 p-1 bg-white rounded-lg shadow-sm">
-            <button
-              onClick={() => setActiveTab("my-recipes")}
-              className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition ${
-                activeTab === "my-recipes"
-                  ? "bg-primary text-white"
-                  : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
-              }`}
-            >
-              My Recipes ({myRecipes.length})
-            </button>
-            <button
-              onClick={() => setActiveTab("saved")}
-              className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition ${
-                activeTab === "saved"
-                  ? "bg-primary text-white"
-                  : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
-              }`}
-            >
-              Saved ({savedRecipes.length})
-            </button>
-            <button
-              onClick={() => setActiveTab("activity")}
-              className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition ${
-                activeTab === "activity"
-                  ? "bg-primary text-white"
-                  : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
-              }`}
-            >
-              Activity
-            </button>
-          </div>
-        </div>
-
-        {/* CONTENT AREA */}
-
-        <div className="p-6 bg-white rounded-lg shadow-sm">
-          {activeTab === "my-recipes" && (
-            <>
-              {myRecipes.length === 0 ? (
-                <EmptyState
-                  icon="🍳"
-                  title="No recipes yet"
-                  description="You haven't uploaded any recipes yet. Start sharing your culinary creations with the community!"
-                  actionLabel="Upload Your First Recipe"
-                  onAction={() => navigate("/add-recipe")}
-                />
-              ) : (
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {myRecipes.map((recipe) => (
-                    <RecipeCardWithActions key={recipe.id} recipe={recipe} />
-                  ))}
-                </div>
-              )}
-            </>
-          )}
-
-          {/* SAVED RECIPES TAB */}
-          {activeTab === "saved" && (
-            <>
-              {myRecipes.length === 0 ? (
-                <EmptyState
-                  icon="🍳"
-                  title="No saved recipes"
-                  description="You haven't saved any recipes yet. Browse recipes and bookmark your favorites to find them easily later!"
-                  actionLabel="Browse Recipes"
-                  onAction={() => navigate("/")}
-                />
-              ) : (
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {savedRecipes.map((recipe) => (
-                    <RecipeCard key={recipe.id} recipe={recipe} />
-                  ))}
-                </div>
-              )}
-            </>
-          )}
-
-          {/* ACTIVITY TAB */}
-          {activeTab === "activity" && (
-            <EmptyState
-              icon="📊"
-              title="Activity feed coming soon"
-              description="This section will show your recent activity, including likes and comments on your recipes."
-            />
-          )}
-        </div>
-      </div>
-    </div>
-  );
 };
-
-export default Dashboard;
