@@ -19,7 +19,7 @@ export interface AuthContextType {
   isLoading: boolean;
   likedRecipes: string[];
   savedRecipes: string[];
-  login: (token: string, user: AuthUser) => void;
+  login: (token: string, user: AuthUser) => Promise<void>;
   logout: () => void;
   setLikedRecipes: (ids: string[]) => void;
   setSavedRecipes: (ids: string[]) => void;
@@ -77,12 +77,23 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   //loginApi() = ask backend to log in
   // login() = save that successful login in frontend
 
-  const login = (newToken: string, newUser: AuthUser) => {
-    localStorage.setItem("olive_token", newToken);
-    setToken(newToken);
-    setUser(newUser);
-    console.log(`[Auth] logged in as ${newUser.email}`);
-  };
+  const login = async (newToken: string, newUser: AuthUser) => {
+  localStorage.setItem("olive_token", newToken);
+  setToken(newToken);
+  setUser(newUser);
+
+  // Load interactions immediately after login
+  // So likedRecipes and savedRecipes are populated right away
+  try {
+    const interactions = await getInteractionsApi(newToken);
+    setLikedRecipes(interactions.likedRecipes);
+    setSavedRecipes(interactions.savedRecipes);
+  } catch (error) {
+    console.error("[AUTH] Could not load interactions after login");
+  }
+
+  console.log(`[Auth] logged in as ${newUser.email}`);
+};
 
   const logout = () => {
     localStorage.removeItem("olive_token");

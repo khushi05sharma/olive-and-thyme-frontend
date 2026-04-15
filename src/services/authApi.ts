@@ -109,8 +109,8 @@ export async function likeRecipeApi(
 // ---- Saved Recipes ----
 
 export async function savedRecipeApi(
-  token: string,
   recipeId: string,
+  token: string,
 ): Promise<{ saved: boolean; savedRecipes: string[] }> {
   const response = await fetch(
     `http://localhost:5000/api/users/save/${recipeId}`,

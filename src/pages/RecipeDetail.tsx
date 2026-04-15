@@ -121,6 +121,10 @@ const RecipeDetail: FC = () => {
   // --------- HANDLER: SAVE ---------
 
   const handleSave = async (): Promise<void> => {
+    //temp bugs to fix
+    console.log("isLoggedIn:", isLoggedIn);
+    console.log("token value:", token);
+    console.log("recipe.id:", recipe?.id);
     if (!isLoggedIn || !token || !recipe) {
       navigate("/Login");
       return;
