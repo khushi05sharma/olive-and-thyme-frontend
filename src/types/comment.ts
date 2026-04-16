@@ -5,6 +5,7 @@
  */
 
 export interface Comment {
+  _id: string;
   id: string;
   recipeId: string; // Which recipe this comment belongs to
   userId: string; // Who posted the comment

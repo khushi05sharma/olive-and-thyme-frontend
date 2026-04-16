@@ -21,7 +21,13 @@ import Badge from "../components/common/Badge";
 import Button from "../components/common/Button";
 import RecipeImage from "../components/common/RecipeImage";
 import { useAuth } from "../context/AuthContext";
-import { likeRecipeApi, savedRecipeApi } from "../services/authApi";
+import {
+  likeRecipeApi,
+  savedRecipeApi,
+  postCommentApi,
+  getCommentsApi,
+  deleteCommentApi,
+} from "../services/authApi";
 
 const RecipeDetail: FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -30,6 +36,7 @@ const RecipeDetail: FC = () => {
   const {
     isLoggedIn,
     token,
+    user,
     likedRecipes,
     savedRecipes,
     setLikedRecipes,
@@ -89,11 +96,37 @@ const RecipeDetail: FC = () => {
   }, [recipe, likedRecipes, savedRecipes]);
 
   // ------ EFFECT 3: LOAD COMMENTS --------
+
   useEffect(() => {
-    if (recipe) {
-      // Phase 3: fetch(`/api/recipes/${recipe.id}/comments`)
-      setComments(getCommentsByRecipeId(recipe.id));
-    }
+    if (!recipe) return;
+
+    const loadComments = async () => {
+      try {
+        const data = await getCommentsApi(recipe.id);
+
+        // convert backend comment shape to your Comment type
+        const format = data.comments.map((c) => ({
+          id: c._id,
+          _id: c._id,
+          recipeId: c.recipeId,
+          userId: c.userId,
+          userName: c.userName,
+          text: c.text,
+          likes: 0,
+          createdAt: new Date(c.createdAt).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          }),
+        }));
+        setComments(format);
+      } catch (error) {
+        console.error("Could not load comments:", error);
+        // Fallback to mock if backend fails
+        setComments(getCommentsByRecipeId(recipe.id));
+      }
+    };
+    loadComments();
   }, [recipe]);
 
   // --------- HANDLER: LIKE ---------
@@ -161,22 +194,53 @@ const RecipeDetail: FC = () => {
   };
 
   // ---- HANDLER: SUBMIT COMMENT ----
-
-  const handleCommentSubmit = (e: React.FormEvent): void => {
+  const handleCommentSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
     if (!newComment.trim() || !recipe) return;
 
-    const comment: Comment = {
-      id: `c${Date.now()}`,
-      recipeId: recipe.id,
-      userId: "current-user",
-      userName: "You",
-      text: newComment,
-      likes: 0,
-      createdAt: "Just now",
-    };
-    setComments([comment, ...comments]);
-    setNewComment("");
+    // not logged in — redirect to login
+    if (!isLoggedIn || !token) {
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const data = await postCommentApi(recipe.id, newComment.trim(), token);
+
+      // convert and add to top of list — no page reload needed
+      const formatted = {
+        id: data.comment._id,
+        _id: data.comment._id,
+        recipeId: data.comment.recipeId,
+        userId: data.comment.userId,
+        userName: data.comment.userName,
+        text: data.comment.text,
+        likes: 0,
+        createdAt: "Just now",
+      };
+
+      setComments([formatted, ...comments]);
+      setNewComment("");
+
+      console.log(`[COMMENT] Posted by ${user?.name}`);
+    } catch (error) {
+      console.error("Comment failed:", error);
+    }
+  };
+
+  // ---- HANDLE DELETE COMMENT --------
+
+  const handleDeleteComment = async (commentId: string) => {
+    if (!token) return;
+
+    try {
+      await deleteCommentApi(commentId, token);
+
+      // remove from UI instantly
+      setComments((prev) => prev.filter((c) => c.id !== commentId));
+    } catch (error) {
+      console.error("Delete failed:", error);
+    }
   };
 
   // -------- LOADING STATE --------
@@ -441,24 +505,38 @@ const RecipeDetail: FC = () => {
             <div className="space-y-4">
               {comments.map((comment) => (
                 <div
-                  key={comment.id}
+                  key={comment._id}
                   className="p-4 border border-gray-200 rounded-lg"
                 >
-                  <div className="flex items-start gap-3 mb-2">
-                    <div className="flex items-center justify-center flex-shrink-0 w-10 h-10 text-sm font-bold text-white rounded-full bg-primary">
-                      {comment.userName.charAt(0)}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-semibold text-gray-800">
-                          {comment.userName}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          • {comment.createdAt}
-                        </span>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-start gap-3 mb-2">
+                      <div className="flex items-center justify-center flex-shrink-0 w-10 h-10 text-sm font-bold text-white rounded-full bg-primary">
+                        {comment.userName.charAt(0)}
                       </div>
-                      <p className="text-gray-700">{comment.text}</p>
+
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-semibold text-gray-800">
+                            {comment.userName}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            • {comment.createdAt}
+                          </span>
+                        </div>
+
+                        <p className="text-gray-700">{comment.text}</p>
+                      </div>
                     </div>
+
+                    {/* 👇 ADD THIS DELETE BUTTON */}
+                    {comment.userId === user?.id && (
+                      <button
+                        onClick={() => handleDeleteComment(comment._id)}
+                        className="text-sm text-red-500 hover:underline"
+                      >
+                        Delete
+                      </button>
+                    )}
                   </div>
                   <div className="flex items-center gap-3">
                     <button className="flex items-center gap-1 text-sm text-gray-500 transition hover:text-primary">

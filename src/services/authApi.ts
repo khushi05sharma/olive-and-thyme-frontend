@@ -89,8 +89,8 @@ export async function getMeApi(token: string): Promise<AuthUser> {
 // --- Like Recipe ---
 
 export async function likeRecipeApi(
-  token: string,
   recipeId: string,
+  token: string,
 ): Promise<{ liked: boolean; likedRecipes: string[] }> {
   const response = await fetch(
     `http://localhost:5000/api/users/like/${recipeId}`,
@@ -140,5 +140,80 @@ export async function getInteractionsApi(
   );
   const data = await response.json();
   if (!response.ok) throw new Error(data.message);
+  return data;
+}
+
+// ------ Post Comment -------------
+
+export async function postCommentApi(
+  recipeId: string,
+  text: string,
+  token: string,
+): Promise<{
+  comment: {
+    _id: string;
+    recipeId: string;
+    userId: string;
+    userName: string;
+    text: string;
+    createdAt: string;
+  };
+}> {
+  const response = await fetch(
+    `http://localhost:5000/api/comments/${recipeId}`,
+    {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ text }),
+    },
+  );
+
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "Failed to post comment");
+  return data;
+}
+
+// ---- GET COMMENTS FOR A RECIPE --------
+
+export async function getCommentsApi(recipeId: string): Promise<{
+  comments: {
+    _id: string;
+    recipeId: string;
+    userId: string;
+    userName: string;
+    text: string;
+    createdAt: string;
+  }[];
+}> {
+  const response = await fetch(
+    `http://localhost:5000/api/comments/${recipeId}`,
+  );
+
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "Failed to fetch comments");
+  return data;
+}
+
+// -------- Delete Comment -----------
+
+export async function deleteCommentApi(
+  commentId: string,
+  token: string,
+): Promise<{ message: string }> {
+  const response = await fetch(
+    `http://localhost:5000/api/comments/${commentId}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "Failed to delete comment");
   return data;
 }
