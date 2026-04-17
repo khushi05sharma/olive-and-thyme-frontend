@@ -217,3 +217,85 @@ export async function deleteCommentApi(
   if (!response.ok) throw new Error(data.message || "Failed to delete comment");
   return data;
 }
+
+// ----- CREATE RECIPE ---------
+
+export async function createRecipeApi(
+  recipeData: {
+    title: string;
+    description: string;
+    image: string;
+    cookingTime: number;
+    servings: number;
+    difficulty: string;
+    cuisine: string;
+    mealType: string;
+    diet: string[];
+    ingredients: string[];
+    instructions: string[];
+  },
+  token: string,
+): Promise<{
+  recipe: { _id: string; title: string; author: { id: string; name: string } };
+}> {
+  const response = await fetch("http://localhost:5000/api/recipes", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(recipeData),
+  });
+
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "Failed to create recipe");
+  return data;
+}
+
+// -------- GET MY RECIPES ----------
+
+export async function getMyRecipesApi(token: string): Promise<{
+  recipes: {
+    _id: string;
+    title: string;
+    description: string;
+    image: string;
+    cookingTime: number;
+    servings: number;
+    difficulty: string;
+    cuisine: string;
+    mealType: string;
+    diet: string[];
+    ingredients: string[];
+    instructions: string[];
+    likes: number;
+    author: { id: string; name: string };
+    createdAt: string;
+  }[];
+}> {
+  const response = await fetch("http://localhost:5000/api/recipes/my", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "Failed to fetch recipes");
+  return data;
+}
+
+// ----- DELETE RECIPE -------
+
+export async function deleteRecipeApi(
+  recipeId: string,
+  token: string,
+): Promise<void> {
+  const response = await fetch(
+    `http://localhost:5000/api/recipes/${recipeId}`,
+    {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  );
+
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "Failed to delete recipe");
+}
