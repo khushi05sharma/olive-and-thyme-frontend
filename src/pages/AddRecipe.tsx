@@ -1,11 +1,11 @@
 import { type FC, useState, type ChangeEvent, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { Upload, X, Plus, Trash2, ChefHat } from "lucide-react";
-import placeholderImg from "../assets/placeholder.png";
+import { X, Plus, Trash2, ChefHat, LinkIcon } from "lucide-react";
+// import placeholderImg from "../assets/placeholder.png";
 
-import { mockRecipes } from "../data/mockRecipes";
-import { mockCurrentUser } from "../data/mockUser";
-import { type Recipe, type MealType } from "../types/recipe";
+import { useAuth } from "../context/AuthContext";
+import { createRecipeApi } from "../services/authApi";
+import { type MealType } from "../types/recipe";
 import Button from "../components/common/Button";
 import Input from "../components/common/Input";
 
@@ -16,7 +16,8 @@ import Input from "../components/common/Input";
 interface FormData {
   title: string;
   description: string;
-  image: string | null;
+  // image: string | null;
+  imageUrl: string;
   cookingTime: number;
   servings: number;
   difficulty: "Easy" | "Medium" | "Hard" | "";
@@ -73,6 +74,8 @@ const DIETS = [
 const AddRecipe: FC = () => {
   const navigate = useNavigate();
 
+  const { user, token, isLoggedIn } = useAuth();
+
   // ══════════════════════════════════════════
   // STATE
   // ══════════════════════════════════════════
@@ -80,7 +83,8 @@ const AddRecipe: FC = () => {
   const [formData, setFormData] = useState<FormData>({
     title: "",
     description: "",
-    image: null,
+    // image: null,
+    imageUrl: "",
     cookingTime: 30,
     servings: 4,
     difficulty: "",
@@ -92,8 +96,9 @@ const AddRecipe: FC = () => {
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  // const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [serverError, setServerError] = useState("");
 
   // ══════════════════════════════════════════
   // HANDLERS: Basic Fields
@@ -105,9 +110,8 @@ const AddRecipe: FC = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
     // Clear error for this field
-    if (errors[name]) {
-      setErrors({ ...errors, [name]: "" });
-    }
+    if (errors[name]) setErrors({ ...errors, [name]: "" });
+    if (serverError) setServerError("");
   };
 
   // ══════════════════════════════════════════
@@ -126,37 +130,37 @@ const AddRecipe: FC = () => {
   // HANDLERS: Image Upload
   // ══════════════════════════════════════════
 
-  const handleImageChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  // const handleImageChange = (e: ChangeEvent<HTMLInputElement>): void => {
+  //   const file = e.target.files?.[0];
+  //   if (!file) return;
 
-    // Validate file type
-    if (!file.type.startsWith("image/")) {
-      setErrors({ ...errors, image: "Please select an image file" });
-      return;
-    }
+  //   // Validate file type
+  //   if (!file.type.startsWith("image/")) {
+  //     setErrors({ ...errors, image: "Please select an image file" });
+  //     return;
+  //   }
 
-    // Validate file size (5MB max)
-    if (file.size > 5 * 1024 * 1024) {
-      setErrors({ ...errors, image: "Image size must be less than 5MB" });
-      return;
-    }
+  //   // Validate file size (5MB max)
+  //   if (file.size > 5 * 1024 * 1024) {
+  //     setErrors({ ...errors, image: "Image size must be less than 5MB" });
+  //     return;
+  //   }
 
-    // Create preview
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const result = reader.result as string;
-      setImagePreview(result);
-      setFormData({ ...formData, image: result });
-      setErrors({ ...errors, image: "" });
-    };
-    reader.readAsDataURL(file);
-  };
+  //   // Create preview
+  //   const reader = new FileReader();
+  //   reader.onloadend = () => {
+  //     const result = reader.result as string;
+  //     setImagePreview(result);
+  //     setFormData({ ...formData, image: result });
+  //     setErrors({ ...errors, image: "" });
+  //   };
+  //   reader.readAsDataURL(file);
+  // };
 
-  const removeImage = (): void => {
-    setImagePreview(null);
-    setFormData({ ...formData, image: null });
-  };
+  // const removeImage = (): void => {
+  //   setImagePreview(null);
+  //   setFormData({ ...formData, image: null });
+  // };
 
   // ══════════════════════════════════════════
   // HANDLERS: Dynamic Ingredients
@@ -255,86 +259,65 @@ const AddRecipe: FC = () => {
     }
 
     // Ingredients
-    const validIngredients = formData.ingredients.filter((i) => i.trim());
-    if (validIngredients.length === 0) {
+    if (!formData.ingredients.some((i) => i.trim()))
       newErrors.ingredients = "At least one ingredient is required";
-    }
 
     // Instructions
-    const validInstructions = formData.instructions.filter((i) => i.trim());
-    if (validInstructions.length === 0) {
+    if (!formData.instructions.some((i) => i.trim()))
       newErrors.instructions = "At least one instruction step is required";
-    }
 
     return newErrors;
   };
 
-  // ══════════════════════════════════════════
-  // SUBMIT
-  // ══════════════════════════════════════════
+  // ----------- SUBMIT -------------
 
   const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
 
-    // Validate
-    const newErrors = validateForm();
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      // Scroll to first error
-      window.scrollTo({ top: 0, behavior: "smooth" });
+    // user must logged-in
+    if (!isLoggedIn || !token) {
+      navigate("/");
       return;
     }
 
+    const newErrors = validateForm();
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
     setIsSubmitting(true);
+    setServerError("");
 
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      await createRecipeApi(
+        {
+          title: formData.title.trim(),
+          description: formData.description.trim(),
+          image: formData.imageUrl.trim(),
+          cookingTime: formData.cookingTime,
+          servings: formData.servings,
+          difficulty: formData.difficulty as "Easy" | "Medium" | "Hard",
+          cuisine: formData.cuisine,
+          mealType: formData.mealType as MealType,
+          diet: formData.diet,
+          ingredients: formData.ingredients.filter((i) => i.trim()),
+          instructions: formData.instructions.filter((i) => i.trim()),
+          // Author NOT sent — backend reads it from JWT token
+        },
+        token,
+      );
 
-    // Create recipe object
-    const newRecipe: Recipe = {
-      id: `recipe-${Date.now()}`,
-      title: formData.title.trim(),
-      description: formData.description.trim(),
-      image: formData.image || placeholderImg, // Fallback
-      cookingTime: formData.cookingTime,
-      servings: formData.servings,
-      difficulty: formData.difficulty as "Easy" | "Medium" | "Hard",
-      cuisine: formData.cuisine,
-      mealType: formData.mealType as MealType,
-      diet: formData.diet,
-      ingredients: formData.ingredients.filter((i) => i.trim()),
-      instructions: formData.instructions.filter((i) => i.trim()),
-      likes: 0,
-      author: {
-        id: mockCurrentUser.id,
-        name: mockCurrentUser.name,
-      },
-      createdAt: new Date().toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-      }),
-    };
-
-    // Phase 1: Add to mockRecipes (simulating backend)
-    mockRecipes.push(newRecipe);
-
-    // Phase 3: POST to backend
-    // const response = await fetch('/api/recipes', {
-    //   method: 'POST',
-    //   body: JSON.stringify(newRecipe)
-    // });
-    // const savedRecipe = await response.json();
-
-    setIsSubmitting(false);
-
-    // Success message
-    alert("Recipe published successfully!");
-
-    // Navigate to dashboard
-    navigate("/dashboard");
+      console.log(`[RECIPE] Published by ${user?.name}`);
+      navigate("/dashboard");
+    } catch (error: any) {
+      setServerError(error.message || "Failed to publish recipe. Try again.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  // ══════════════════════════════════════════
   // RENDER
   return (
     <div className="min-h-screen py-8 bg-primary-light">
@@ -353,50 +336,73 @@ const AddRecipe: FC = () => {
           </p>
         </div>
 
+        {/* Server error banner */}
+        {serverError && (
+          <div className="p-4 mb-6 text-sm text-red-700 border border-red-200 rounded-lg bg-red-50">
+            {serverError}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* IMAGE UPLOAD SECTION */}
 
-          <div className="p-6 bg-white rounded-lg shadow-sm soft-glow">
+          <div className="p-6 bg-white rounded-lg shadow-sm">
             <h2 className="mb-4 text-xl font-semibold text-gray-800">
               Recipe Image
             </h2>
 
-            {imagePreview ? (
-              <div className="relative">
-                <img
-                  src={imagePreview}
-                  alt="Recipe preview"
-                  className="object-cover w-full h-64 rounded-lg"
-                />
-                <button
-                  type="button"
-                  onClick={removeImage}
-                  className="absolute p-2 text-white transition bg-red-500 rounded-full top-2 right-2 hover:bg-red-600"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-            ) : (
-              <label className="relative flex flex-col items-center justify-center h-64 overflow-hidden transition border-2 border-gray-300 border-dashed rounded-lg cursor-pointer hover:border-primary">
-                <div className="absolute inset-0 transition-opacity duration-300 opacity-0 bg-gradient-to-br from-pink-200/40 via-yellow-200/40 to-pink-300/40 hover:opacity-100" />
-                <Upload size={48} className="mb-2 text-gray-400" />
-                <span className="mb-1 text-sm font-medium text-gray-700">
-                  Click to upload or drag and drop
-                </span>
-                <span className="text-xs text-gray-500">
-                  PNG, JPG (max 5MB)
-                </span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
-                />
+            {/* File upload — disabled for now */}
+            <div className="flex flex-col items-center justify-center h-40 border-2 border-gray-200 border-dashed rounded-lg bg-gray-50">
+              <p className="text-sm font-medium text-gray-400">
+                File upload coming soon
+              </p>
+              <p className="mt-1 text-xs text-gray-400">
+                Use the URL option below
+              </p>
+            </div>
+
+            {/* NEW — image URL input */}
+
+            <div className="mt-4">
+              <label className="flex items-center gap-2 mb-1 text-sm font-medium text-gray-700">
+                <LinkIcon size={16} />
+                Image URL (optional)
               </label>
-            )}
-            {errors.image && (
-              <p className="mt-2 text-sm text-red-500">{errors.image}</p>
-            )}
+              <input
+                type="url"
+                name="imageUrl"
+                value={formData.imageUrl}
+                onChange={handleInputChange}
+                placeholder="https://example.com/my-recipe-image.jpg"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                Paste a direct image URL. Leave empty to use a default
+                placeholder.
+              </p>
+
+              {/* Preview if URL entered */}
+              {formData.imageUrl && (
+                <div className="relative mt-3">
+                  <img
+                    src={formData.imageUrl}
+                    alt="Preview"
+                    className="object-cover w-full h-48 rounded-lg"
+                    onError={(e) => {
+                      // If URL is broken — hide preview
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, imageUrl: "" })}
+                    className="absolute p-1 text-white bg-red-500 rounded-full top-2 right-2 hover:bg-red-600"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* BASIC INFORMATION */}
