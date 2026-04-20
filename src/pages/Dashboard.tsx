@@ -3,15 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { ChefHat, Heart, Bookmark, Plus, Edit, Trash2 } from "lucide-react";
 
 import { useAuth } from "../context/AuthContext";
-import { fetchRecipeById } from "../services/spoonacularApi";
 import { type Recipe } from "../types/recipe";
 import { type DashboardTab } from "../types/user";
 import Button from "../components/common/Button";
 import RecipeCard from "../components/recipe/RecipeCard";
+import { getMyRecipesApi, deleteRecipeApi } from "../services/authApi";
 
 const Dashboard: FC = () => {
   const navigate = useNavigate();
-  const { user, savedRecipes } = useAuth();
+  const { user, savedRecipes, token } = useAuth();
 
   const [activeTab, setActiveTab] = useState<DashboardTab>("my-recipes");
 
@@ -19,9 +19,9 @@ const Dashboard: FC = () => {
   const [savedRecipeDetails, setSavedRecipeDetails] = useState<Recipe[]>([]);
   const [isLoadingSaved, setIsLoadingSaved] = useState(false);
 
-  // My recipes — still mock for now (until Add Recipe saves to DB)
-  // Phase 3 later: fetch from GET /api/recipes/my
-  const myRecipes: Recipe[] = []; // empty until Add Recipe backend is done
+  // My recipes
+  const [myRecipes, setMyRecipes] = useState<Recipe[]>([]);
+  const [isLoadingMyRecipes, setIsLoadingMyRecipes] = useState(false);
 
   // ---- FETCH SAVED RECIPE DETAILS ----
   // savedRecipes in AuthContext is just an array of IDs like ["1234, "5678"]
@@ -29,6 +29,47 @@ const Dashboard: FC = () => {
   // Only fetch when user switches to Saved tab — saves API quota
 
   useEffect(() => {
+    if (activeTab !== "my-recipes" || !token) return;
+
+    const loadMyRecipes = async () => {
+      setIsLoadingMyRecipes(true);
+      try {
+        const data = await getMyRecipesApi(token);
+        // Convert backend shape to Recipe type
+        const converted: Recipe[] = data.recipes.map((r) => ({
+          id: r._id,
+          title: r.title,
+          description: r.description,
+          image: r.image || "",
+          cookingTime: r.cookingTime,
+          servings: r.servings,
+          difficulty: r.difficulty as "Easy" | "Medium" | "Hard",
+          cuisine: r.cuisine,
+          mealType: r.mealType as any,
+          diet: r.diet,
+          ingredients: r.ingredients,
+          instructions: r.instructions,
+          likes: r.likes,
+          author: r.author,
+          createdAt: new Date(r.createdAt).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+          }),
+        }));
+        setMyRecipes(converted);
+      } catch (error) {
+        console.error("Failed to load my recipes:", error);
+      } finally {
+        setIsLoadingMyRecipes(false);
+      }
+    };
+
+    loadMyRecipes();
+  }, [activeTab, token]);
+
+  useEffect(() => {
+    if (activeTab !== "saved" || !token) return;
+
     const loadSavedRecipes = async () => {
       if (savedRecipes.length === 0) {
         setSavedRecipeDetails([]);
@@ -36,8 +77,8 @@ const Dashboard: FC = () => {
       }
 
       setIsLoadingSaved(true);
-
       try {
+        const { fetchRecipeById } = await import("../services/spoonacularApi");
         const recipes = await Promise.all(
           savedRecipes.map((id) => fetchRecipeById(id)),
         );
@@ -49,10 +90,8 @@ const Dashboard: FC = () => {
       }
     };
 
-    if (activeTab === "saved") {
-      loadSavedRecipes();
-    }
-  }, [savedRecipes, activeTab]);
+    loadSavedRecipes();
+  }, [activeTab, savedRecipes, token]);
 
   // ---- STATS -------
   // totalLikes = likes received on my uploaded recipes
@@ -63,12 +102,19 @@ const Dashboard: FC = () => {
 
   // ----- HANDLERS ---
 
-  const handleDeleteRecipe = (recipeId: string): void => {
-    if (window.confirm("Are you sure you want to delete this recipe?")) {
-      console.log("Deleting recipe with ID:", recipeId);
+  const handleDeleteRecipe = async (recipeId: string): Promise<void> => {
+    if (!window.confirm("Are you sure you want to delete this recipe?")) return;
+    if (!token) return;
+
+    try {
+      await deleteRecipeApi(recipeId, token);
+      // Remove from local state — no need to refetch
+      setMyRecipes(myRecipes.filter((r) => r.id !== recipeId));
+      console.log(`[RECIPE] Deleted from dashboard: ${recipeId}`);
+    } catch (error) {
+      console.error("Delete failed:", error);
     }
   };
-
   const handleEditRecipe = (recipeId: string): void => {
     // Phase 3: navigate to edit page
     alert(`Edit coming in Phase 3! Recipe ID: ${recipeId}`);
@@ -114,13 +160,13 @@ const Dashboard: FC = () => {
   const RecipeCardWithActions: FC<{ recipe: Recipe }> = ({ recipe }) => (
     <div className="relative group">
       <RecipeCard recipe={recipe} />
-      <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="absolute flex gap-2 transition-opacity opacity-0 top-2 right-2 group-hover:opacity-100">
         <button
           onClick={(e) => {
             e.stopPropagation();
             handleEditRecipe(recipe.id);
           }}
-          className="p-2 text-white rounded-full bg-blue-500 hover:bg-blue-600 transition shadow-lg"
+          className="p-2 text-white transition bg-blue-500 rounded-full shadow-lg hover:bg-blue-600"
         >
           <Edit size={16} />
         </button>
@@ -129,7 +175,7 @@ const Dashboard: FC = () => {
             e.stopPropagation();
             handleDeleteRecipe(recipe.id);
           }}
-          className="p-2 text-white rounded-full bg-red-500 hover:bg-red-600 transition shadow-lg"
+          className="p-2 text-white transition bg-red-500 rounded-full shadow-lg hover:bg-red-600"
         >
           <Trash2 size={16} />
         </button>
@@ -225,9 +271,23 @@ const Dashboard: FC = () => {
 
         {/* CONTENT AREA */}
         <div className="p-6 bg-white rounded-lg shadow-sm">
-          {/* MY RECIPES TAB */}
           {activeTab === "my-recipes" &&
-            (myRecipes.length === 0 ? (
+            (isLoadingMyRecipes ? (
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="overflow-hidden bg-gray-100 rounded-xl animate-pulse"
+                  >
+                    <div className="w-full h-48 bg-gray-200" />
+                    <div className="p-4 space-y-2">
+                      <div className="w-3/4 h-4 bg-gray-200 rounded" />
+                      <div className="w-1/2 h-3 bg-gray-100 rounded" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : myRecipes.length === 0 ? (
               <EmptyState
                 icon="🍳"
                 title="No recipes yet"

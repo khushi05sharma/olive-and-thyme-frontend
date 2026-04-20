@@ -27,6 +27,7 @@ import {
   postCommentApi,
   getCommentsApi,
   deleteCommentApi,
+   getRecipeByIdApi ,
 } from "../services/authApi";
 
 const RecipeDetail: FC = () => {
@@ -60,32 +61,42 @@ const RecipeDetail: FC = () => {
   // ----- EFFECT 1: LOAD RECIPE --------
 
   useEffect(() => {
-    if (!id) return;
+  if (!id) return;
 
-    const loadRecipe = async () => {
-      setIsLoading(true);
-      setError(null);
+  const loadRecipe = async () => {
+    setIsLoading(true);
+    setError(null);
 
-      try {
-        const data = await fetchRecipeById(id);
-        setRecipe(data);
-        setLikeCount(data.likes);
-      } catch (error) {
-        const found = mockRecipes.find((r) => r.id === id);
-        if (found) {
-          setRecipe(found);
-          setLikeCount(found.likes);
-        } else {
-          setError("Failed to load recipe. Please try again later.");
-        }
-      } finally {
-        setIsLoading(false);
+    try {
+      let data;
+
+      if (id.length > 10) {
+        data = await getRecipeByIdApi(id);
+        data = data.recipe || data;
+      } else {
+        data = await fetchRecipeById(id);
       }
-    };
-    loadRecipe();
-    window.scrollTo(0, 0);
-  }, [id]);
 
+      setRecipe(data);
+      setLikeCount(data.likes || 0);
+
+    } catch (error) {
+      const found = mockRecipes.find((r) => r.id === id);
+      if (found) {
+        setRecipe(found);
+        setLikeCount(found.likes);
+      } else {
+        setError("Failed to load recipe. Please try again later.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  loadRecipe();
+  window.scrollTo(0, 0);
+}, [id]);
+  
   // ----- EFFECT 2: SYNC LIKE/SAVE STATE  --------
 
   useEffect(() => {
@@ -154,10 +165,6 @@ const RecipeDetail: FC = () => {
   // --------- HANDLER: SAVE ---------
 
   const handleSave = async (): Promise<void> => {
-    //temp bugs to fix
-    console.log("isLoggedIn:", isLoggedIn);
-    console.log("token value:", token);
-    console.log("recipe.id:", recipe?.id);
     if (!isLoggedIn || !token || !recipe) {
       navigate("/Login");
       return;

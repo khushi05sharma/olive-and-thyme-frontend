@@ -415,7 +415,7 @@ const AddRecipe: FC = () => {
             <div className="space-y-4">
               <Input
                 label="Recipe Title"
-                name="Title"
+                name="title"
                 value={formData.title}
                 onChange={handleInputChange}
                 placeholder="e.g: Creamy Mushroom Pasta"
