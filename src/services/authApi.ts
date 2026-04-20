@@ -282,6 +282,20 @@ export async function getMyRecipesApi(token: string): Promise<{
   return data;
 }
 
+// -------- GET SINGLE RECIPE BY ID ----------
+
+export async function getRecipeByIdApi(id: string) {
+  const response = await fetch(`http://localhost:5000/api/recipes/${id}`);
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to fetch recipe");
+  }
+
+  return data; 
+}
+
 // ----- DELETE RECIPE -------
 
 export async function deleteRecipeApi(
