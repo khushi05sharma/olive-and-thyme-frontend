@@ -1,10 +1,20 @@
-import { type FC, useState, type ChangeEvent, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import {
+  type FC,
+  useState,
+  useEffect,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { X, Plus, Trash2, ChefHat, LinkIcon } from "lucide-react";
 // import placeholderImg from "../assets/placeholder.png";
 
 import { useAuth } from "../context/AuthContext";
-import { createRecipeApi } from "../services/authApi";
+import {
+  createRecipeApi,
+  getRecipeByIdApi,
+  updateRecipeApi,
+} from "../services/authApi";
 import { type MealType } from "../types/recipe";
 import Button from "../components/common/Button";
 import Input from "../components/common/Input";
@@ -76,6 +86,11 @@ const AddRecipe: FC = () => {
 
   const { user, token, isLoggedIn } = useAuth();
 
+  const { id } = useParams(); // get ID from URL
+
+  // EDIT FEATURE — check if editing
+  const isEditMode = Boolean(id);
+
   // ══════════════════════════════════════════
   // STATE
   // ══════════════════════════════════════════
@@ -99,6 +114,38 @@ const AddRecipe: FC = () => {
   // const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverError, setServerError] = useState("");
+
+  // Runs when page loads OR when id changes
+
+  useEffect(() => {
+    if (!id) return;
+
+    // function to fetch recipe from backend
+    const loadRecipe = async () => {
+      try {
+        const data = await getRecipeByIdApi(id);
+        const r = data.recipe || data;
+
+        // fill form with existing recipe data
+        setFormData({
+          title: r.title,
+          description: r.description,
+          imageUrl: r.image || "",
+          cookingTime: r.cookingTime,
+          servings: r.servings,
+          difficulty: r.difficulty,
+          cuisine: r.cuisine,
+          mealType: r.mealType,
+          diet: r.diet || [],
+          ingredients: r.ingredients,
+          instructions: r.instructions,
+        });
+      } catch (error) {
+        console.error("Failed to load recipe for edit", error);
+      }
+    };
+    loadRecipe();
+  }, [id]);
 
   // ══════════════════════════════════════════
   // HANDLERS: Basic Fields
@@ -274,7 +321,7 @@ const AddRecipe: FC = () => {
   const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
 
-    // user must logged-in
+    // user must be logged-in
     if (!isLoggedIn || !token) {
       navigate("/");
       return;
@@ -286,34 +333,66 @@ const AddRecipe: FC = () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
+
     setIsSubmitting(true);
     setServerError("");
 
     try {
-      await createRecipeApi(
-        {
-          title: formData.title.trim(),
-          description: formData.description.trim(),
-          image: formData.imageUrl.trim(),
-          cookingTime: formData.cookingTime,
-          servings: formData.servings,
-          difficulty: formData.difficulty as "Easy" | "Medium" | "Hard",
-          cuisine: formData.cuisine,
-          mealType: formData.mealType as MealType,
-          diet: formData.diet,
-          ingredients: formData.ingredients.filter((i) => i.trim()),
-          instructions: formData.instructions.filter((i) => i.trim()),
-          // Author NOT sent — backend reads it from JWT token
-        },
-        token,
-      );
+      // check if we are in edit mode or create mode
+      if (isEditMode && id) {
+        // update existing recipe (PUT request)
+        await updateRecipeApi(
+          id,
+          {
+            title: formData.title.trim(),
+            description: formData.description.trim(),
+            image: formData.imageUrl.trim(),
+            cookingTime: formData.cookingTime,
+            servings: formData.servings,
+            difficulty: formData.difficulty,
+            cuisine: formData.cuisine,
+            mealType: formData.mealType,
+            diet: formData.diet,
+            ingredients: formData.ingredients.filter((i) => i.trim()),
+            instructions: formData.instructions.filter((i) => i.trim()),
+          },
+          token,
+        );
 
-      console.log(`[RECIPE] Published by ${user?.name}`);
+        // log for debugging
+        console.log(`[RECIPE] Updated by ${user?.name}`);
+      } else {
+        // create new recipe (POST request)
+        await createRecipeApi(
+          {
+            title: formData.title.trim(),
+            description: formData.description.trim(),
+            image: formData.imageUrl.trim(),
+            cookingTime: formData.cookingTime,
+            servings: formData.servings,
+            difficulty: formData.difficulty as "Easy" | "Medium" | "Hard",
+            cuisine: formData.cuisine,
+            mealType: formData.mealType as MealType,
+            diet: formData.diet,
+            ingredients: formData.ingredients.filter((i) => i.trim()),
+            instructions: formData.instructions.filter((i) => i.trim()),
+            // author is handled by backend using token
+          },
+          token,
+        );
+
+        // log for debugging
+        console.log(`[RECIPE] Published by ${user?.name}`);
+      }
+
+      // after both create or update → go to dashboard
       navigate("/dashboard");
     } catch (error: any) {
-      setServerError(error.message || "Failed to publish recipe. Try again.");
+      // handle error from backend
+      setServerError(error.message || "Failed to submit recipe. Try again.");
       window.scrollTo({ top: 0, behavior: "smooth" });
     } finally {
+      // stop loading state
       setIsSubmitting(false);
     }
   };
@@ -328,7 +407,7 @@ const AddRecipe: FC = () => {
             <ChefHat size={50} className="text-white bg-primary rounded-xl" />
           </div>
           <h1 className="mb-2 text-3xl font-bold text-gray-800">
-            Share Your Recipe
+            {isEditMode ? "Edit Your Recipe" : "Share Your Recipe"}
           </h1>
           <p className="text-gray-600">
             Fill in the details below to share your culinary creation with the
@@ -706,12 +785,14 @@ const AddRecipe: FC = () => {
               {isSubmitting ? (
                 <>
                   <span className="w-4 h-4 border-2 border-white rounded-full border-t-transparent animate-spin"></span>
-                  Publishing...
+                  {isEditMode ? "Updating..." : "Publishing..."}
+                  {/* loading text changes based on mode */}
                 </>
               ) : (
                 <>
                   <ChefHat size={20} />
-                  Publish Recipe
+                  {isEditMode ? "Update Recipe" : "Publish Recipe"}
+                  {/* button text changes based on mode */}
                 </>
               )}
             </Button>
