@@ -8,10 +8,11 @@ import { type DashboardTab } from "../types/user";
 import Button from "../components/common/Button";
 import RecipeCard from "../components/recipe/RecipeCard";
 import { getMyRecipesApi, deleteRecipeApi } from "../services/authApi";
+import { mockRecipes } from "../data/mockRecipes";
 
 const Dashboard: FC = () => {
   const navigate = useNavigate();
-  const { user, savedRecipes, token } = useAuth();
+  const { user, savedRecipes, likedRecipes, token } = useAuth();
 
   const [activeTab, setActiveTab] = useState<DashboardTab>("my-recipes");
 
@@ -71,24 +72,48 @@ const Dashboard: FC = () => {
     if (activeTab !== "saved" || !token) return;
 
     const loadSavedRecipes = async () => {
-      if (savedRecipes.length === 0) {
-        setSavedRecipeDetails([]);
-        return;
-      }
+  if (savedRecipes.length === 0) {
+    setSavedRecipeDetails([]);
+    return;
+  }
 
-      setIsLoadingSaved(true);
-      try {
-        const { fetchRecipeById } = await import("../services/spoonacularApi");
-        const recipes = await Promise.all(
-          savedRecipes.map((id) => fetchRecipeById(id)),
-        );
-        setSavedRecipeDetails(recipes);
-      } catch (error) {
-        console.error("Failed to load saved recipes:", error);
-      } finally {
-        setIsLoadingSaved(false);
-      }
-    };
+  setIsLoadingSaved(true);
+
+  try {
+    const { fetchRecipeById } = await import("../services/spoonacularApi");
+
+    const results = await Promise.all(
+      savedRecipes.map(async (id) => {
+
+        // skip invalid
+        if (!id) return null;
+
+        // 1. Spoonacular ID (number)
+        if (!isNaN(Number(id))) {
+          return await fetchRecipeById(id);
+        }
+
+        // 2. MongoDB ID
+        if (id.length > 10) {
+          const res = await fetch(`http://localhost:5000/api/recipes/${id}`);
+          const data = await res.json();
+          return data;
+        }
+
+        // 3. Mock recipes
+        const mock = mockRecipes.find((r) => r.id === id);
+        return mock || null;
+      })
+    );
+
+    setSavedRecipeDetails(results.filter(Boolean));
+
+  } catch (error) {
+    console.error("Failed to load saved recipes:", error);
+  } finally {
+    setIsLoadingSaved(false);
+  }
+};
 
     loadSavedRecipes();
   }, [activeTab, savedRecipes, token]);
@@ -116,8 +141,7 @@ const Dashboard: FC = () => {
     }
   };
   const handleEditRecipe = (recipeId: string): void => {
-    // Phase 3: navigate to edit page
-    alert(`Edit coming in Phase 3! Recipe ID: ${recipeId}`);
+    navigate(`/edit-recipe/${recipeId}`);
   };
 
   // ---- STAT CARD --------
@@ -339,11 +363,79 @@ const Dashboard: FC = () => {
 
           {/* ACTIVITY TAB */}
           {activeTab === "activity" && (
-            <EmptyState
-              icon="📊"
-              title="Activity feed coming soon"
-              description="This section will show your recent likes, saves, and comments. Coming in the next update!"
-            />
+            <div>
+              <h3 className="mb-6 text-lg font-semibold text-gray-800">
+                Recent Activity
+              </h3>
+
+              {likedRecipes.length === 0 && savedRecipes.length === 0 ? (
+                <EmptyState
+                  icon="📊"
+                  title="No activity yet"
+                  description="Start liking and saving recipes to see your activity here!"
+                  actionLabel="Browse Recipes"
+                  onAction={() => navigate("/")}
+                />
+              ) : (
+                <div className="space-y-3">
+                  {/* LIKED RECIPES */}
+                  {likedRecipes.map((recipeId) => (
+                    <div
+                      key={`like-${recipeId}`}
+                      className="flex items-center gap-4 p-4 transition border border-gray-100 rounded-lg cursor-pointer hover:bg-gray-50"
+                      onClick={() => navigate(`/recipe/${recipeId}`)}
+                    >
+                      {/* Icon */}
+                      <div className="flex items-center justify-center flex-shrink-0 w-10 h-10 bg-red-100 rounded-full">
+                        <Heart
+                          size={18}
+                          className="text-red-500 fill-current"
+                        />
+                      </div>
+                      {/* Text */}
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-800">
+                          You liked a recipe
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Recipe ID: {recipeId}
+                        </p>
+                      </div>
+                      {/* Arrow */}
+                      <span className="text-sm text-gray-400">→</span>
+                    </div>
+                  ))}
+
+                  {/* SAVED RECIPES */}
+                  {savedRecipes.map((recipeId) => (
+                    <div
+                      key={`save-${recipeId}`}
+                      className="flex items-center gap-4 p-4 transition border border-gray-100 rounded-lg cursor-pointer hover:bg-gray-50"
+                      onClick={() => navigate(`/recipe/${recipeId}`)}
+                    >
+                      {/* Icon */}
+                      <div className="flex items-center justify-center flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full">
+                        <Bookmark
+                          size={18}
+                          className="text-blue-500 fill-current"
+                        />
+                      </div>
+                      {/* Text */}
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-800">
+                          You saved a recipe
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Recipe ID: {recipeId}
+                        </p>
+                      </div>
+                      {/* Arrow */}
+                      <span className="text-sm text-gray-400">→</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>
