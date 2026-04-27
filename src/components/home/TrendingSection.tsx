@@ -27,7 +27,7 @@ const TrendingSection: FC<TrendingSectionProps> = ({
               <h2 className="text-2xl font-bold text-gray-800 sm:text-3xl">
                 Trending Now
               </h2>
-              <p className="text-sm text-gray-600">Most popular recipes this week</p>
+              <p className="text-sm text-gray-600">Most popular recipes</p>
             </div>
           </div>
           {/* Skeleton cards while API loads */}
@@ -64,7 +64,7 @@ const TrendingSection: FC<TrendingSectionProps> = ({
             <h2 className="text-2xl font-bold text-gray-800 sm:text-3xl">
               Trending Now
             </h2>
-            <p className="text-sm text-gray-600">Most popular recipes this week</p>
+            <p className="text-sm text-gray-600">Most popular recipes</p>
           </div>
         </div>
 

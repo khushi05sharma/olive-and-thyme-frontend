@@ -293,7 +293,31 @@ export async function getRecipeByIdApi(id: string) {
     throw new Error(data.message || "Failed to fetch recipe");
   }
 
-  return data; 
+  return data;
+}
+
+// ---- UPDATE/EDIT RECIPE -------
+
+export async function updateRecipeApi(
+  recipeId: string,
+  recipeData: any,
+  token: string,
+): Promise<{ recipe: any }> {
+  const response = await fetch(
+    `http://localhost:5000/api/recipes/${recipeId}`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(recipeData),
+    },
+  );
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "Failed to update recipe");
+
+  return data;
 }
 
 // ----- DELETE RECIPE -------
