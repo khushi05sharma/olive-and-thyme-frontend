@@ -158,7 +158,7 @@ export async function fetchTrendingRecipes(): Promise<Recipe[]> {
   
   // FIXED — "popular" is not a food keyword, returns empty
   // Use broad term so API has many recipes to sort by popularity
-  url.searchParams.set("query", "chicken");
+  url.searchParams.set("query", "food");
   url.searchParams.set("sort", "popularity");
   url.searchParams.set("number", "4");
   url.searchParams.set("addRecipeInformation", "true");
