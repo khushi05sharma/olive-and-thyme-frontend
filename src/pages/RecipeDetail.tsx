@@ -71,8 +71,14 @@ const RecipeDetail: FC = () => {
       let data;
 
       if (id.length > 10) {
-        data = await getRecipeByIdApi(id);
-        data = data.recipe || data;
+         const result = await getRecipeByIdApi(id);
+  const raw = result.recipe || result;
+  
+  // map _id to id so recipe.id works everywhere
+  data = {
+    ...raw,
+    id: raw._id || raw.id,  // ensure id is set correctly
+  };
       } else {
         data = await fetchRecipeById(id);
       }

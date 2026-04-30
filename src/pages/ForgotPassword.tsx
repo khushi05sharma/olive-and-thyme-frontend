@@ -10,7 +10,7 @@ const ForgotPassword: FC = () => {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // After successful submission — show success message instead of form
+  // after successful submision — show success message instead of form
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const validateEmail = (): boolean => {
@@ -37,20 +37,31 @@ const ForgotPassword: FC = () => {
 
     setIsSubmitting(true);
 
-    // Phase 3: Replace this with real API call
-    // const response = await fetch("/api/auth/forgot-password", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({ email }),
-    // });
-    // const data = await response.json();
-    // if (!response.ok) { setError(data.message); return; }
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/auth/forgot-password",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        },
+      );
 
-    // For now — simulate delay then show success
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+      const data = await response.json();
 
-    setIsSubmitting(false);
-    setIsSubmitted(true); // switch to success view
+      if (!response.ok) {
+        setError(data.message || "Something went wrong. Try again.");
+        return;
+      }
+
+      // will show success view - same for both found and not found emails
+      // backend returns success to prevent email fraud
+      setIsSubmitted(true);
+    } catch (err) {
+      setError("Could not connect to server. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

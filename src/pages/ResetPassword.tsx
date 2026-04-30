@@ -50,28 +50,37 @@ const ResetPassword: FC = () => {
 
     setIsSubmitting(true);
 
-    // Phase 3: Replace with real API call
-    // const response = await fetch(`/api/auth/reset-password/${token}`, {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({ password: formData.password }),
-    // });
-    // const data = await response.json();
-    // if (!response.ok) { setErrors({ password: data.message }); return; }
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/auth/reset-password/${token}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password: formData.password }),
+        },
+      );
 
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+      const data = await response.json();
 
-    setIsSubmitting(false);
-    setIsSuccess(true);
+      if (!response.ok) {
+        // token expired or invalid - show error inside form
+        setErrors({ password: data.message });
+        return;
+      }
 
-    // Redirect to login after 3 seconds
-    setTimeout(() => navigate("/login"), 3000);
+      // show success screen then redirect to login
+      setIsSuccess(true);
+      setTimeout(() => navigate("/login"), 3000);
+    } catch (err) {
+      setErrors({ password: "Could not connect to server. Please try again." });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen px-4 py-10 sm:px-6 lg:px-8 bg-gradient-to-br from-orange-50 via-primary-light to-yellow-50">
       <div className="w-full max-w-md mx-auto">
-
         {/* Logo + Title */}
         <div className="mb-6 text-center">
           <Link to="/" className="inline-block mb-3">
@@ -91,7 +100,6 @@ const ResetPassword: FC = () => {
 
         {/* Card */}
         <div className="w-full p-5 bg-white shadow-lg sm:p-6 md:p-8 rounded-xl">
-
           {/* SUCCESS VIEW */}
           {isSuccess ? (
             <div className="py-4 text-center">
@@ -102,20 +110,17 @@ const ResetPassword: FC = () => {
                 Password reset!
               </h2>
               <p className="mb-6 text-sm text-gray-600">
-                Your password has been successfully changed.
-                Redirecting you to login...
+                Your password has been successfully changed. Redirecting you to
+                login...
               </p>
               <div className="w-8 h-8 mx-auto border-2 rounded-full border-primary border-t-transparent animate-spin" />
             </div>
-
           ) : (
-
             /* FORM VIEW */
             <form onSubmit={handleSubmit} className="space-y-5">
-
               <p className="text-sm text-gray-600">
-                Choose a new password for your account. Make sure it's at
-                least 6 characters long.
+                Choose a new password for your account. Make sure it's at least
+                6 characters long.
               </p>
 
               {/* New Password */}
@@ -188,16 +193,19 @@ const ResetPassword: FC = () => {
                 <ArrowLeft size={16} />
                 Back to login
               </Link>
-
             </form>
           )}
         </div>
 
         <p className="mt-6 text-[11px] sm:text-xs text-center text-gray-500">
           By using this service, you agree to our{" "}
-          <a href="#" className="underline hover:text-gray-700">Terms of Service</a>
-          {" "}and{" "}
-          <a href="#" className="underline hover:text-gray-700">Privacy Policy</a>
+          <a href="#" className="underline hover:text-gray-700">
+            Terms of Service
+          </a>{" "}
+          and{" "}
+          <a href="#" className="underline hover:text-gray-700">
+            Privacy Policy
+          </a>
         </p>
       </div>
     </div>

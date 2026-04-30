@@ -8,7 +8,7 @@ import { type Comment } from "../types/comment";
 export const mockComments: Comment[] = [
   // PIZZA (id: 1)
   {
-    id: "c1",
+    _id: "c1",
     recipeId: "1",
     userId: "user2",
     userName: "Kavya Sharma",
@@ -17,7 +17,7 @@ export const mockComments: Comment[] = [
     createdAt: "2 days ago",
   },
   {
-    id: "c2",
+    _id: "c2",
     recipeId: "1",
     userId: "user3",
     userName: "Namita Papnai",
@@ -29,7 +29,7 @@ export const mockComments: Comment[] = [
   // THAI GREEN CURRY (id: 2)
 
   {
-    id: "c3",
+    _id: "c3",
     recipeId: "2",
     userId: "user1",
     userName: "Khushi Sharma",
@@ -38,7 +38,7 @@ export const mockComments: Comment[] = [
     createdAt: "1 day ago",
   },
   {
-    id: "c4",
+    _id: "c4",
     recipeId: "2",
     userId: "user4",
     userName: "Annu Sharma",
@@ -49,7 +49,7 @@ export const mockComments: Comment[] = [
 
   // PANCAKES (id: 3)
   {
-    id: "c5",
+    _id: "c5",
     recipeId: "3",
     userId: "user5",
     userName: "Nannu Papnai",
@@ -60,7 +60,7 @@ export const mockComments: Comment[] = [
 
   // MUSHROOM PASTA (id: 4)
   {
-    id: "c6",
+    _id: "c6",
     recipeId: "4",
     userId: "user6",
     userName: "Ishita Papnai",
@@ -71,7 +71,7 @@ export const mockComments: Comment[] = [
 
   // CHOCOLATE LAVA CAKE (id: 5)
   {
-    id: "c7",
+    _id: "c7",
     recipeId: "5",
     userId: "user7",
     userName: "Manya Rajwar",
@@ -82,7 +82,7 @@ export const mockComments: Comment[] = [
 
   // QUINOA SALAD (id: 6)
   {
-    id: "c8",
+    _id: "c8",
     recipeId: "6",
     userId: "user3",
     userName: "Namita Papnai",
@@ -93,7 +93,7 @@ export const mockComments: Comment[] = [
 
   // CHICKEN BURGER (id: 7)
   {
-    id: "c9",
+    _id: "c9",
     recipeId: "7",
     userId: "user2",
     userName: "Kavya Sharma",
@@ -104,7 +104,7 @@ export const mockComments: Comment[] = [
 
   // MANGO SMOOTHIE (id: 8)
   {
-    id: "c10",
+    _id: "c10",
     recipeId: "8",
     userId: "user4",
     userName: "Annu Sharma",
@@ -115,7 +115,7 @@ export const mockComments: Comment[] = [
 
   // VEG SANDWICH (id: 9)
   {
-    id: "c11",
+    _id: "c11",
     recipeId: "9",
     userId: "user1",
     userName: "Khushi Sharma",
@@ -126,7 +126,7 @@ export const mockComments: Comment[] = [
 
   // SALMON (id: 10)
   {
-    id: "c12",
+    _id: "c12",
     recipeId: "10",
     userId: "user5",
     userName: "Nannu Papnai",

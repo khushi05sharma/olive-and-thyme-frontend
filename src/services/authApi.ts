@@ -337,3 +337,60 @@ export async function deleteRecipeApi(
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || "Failed to delete recipe");
 }
+
+// ----------- GET NOTIFICATIONS ----------
+
+export async function getNotificationsApi(token: string): Promise<{
+  notifications: {
+    _id: string;
+    recipientId: string;
+    actorId: string;
+    actorName: string;
+    type: "like" | "comment";
+    recipeId: string;
+    recipeTitle: string;
+    message: string;
+    read: boolean;
+    createdAt: string;
+  }[];
+  unreadCount: number;
+}> {
+  const response = await fetch("http://localhost:5000/api/notifications", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message);
+  return data;
+}
+
+// ------ MARK ONE READ ----
+export async function markNotificationReadApi(
+  notificationId: string,
+  token: string,
+): Promise<void> {
+  await fetch(
+    `http://localhost:5000/api/notifications/${notificationId}/read`,
+    { method: "PATCH", headers: { Authorization: `Bearer ${token}` } },
+  );
+}
+
+// ----- MARK ALL READ -----------
+export async function markAllNotificationsReadApi(
+  token: string,
+): Promise<void> {
+  await fetch("http://localhost:5000/api/notifications/read-all", {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+// ----- DELETE NOTIFICATION ---
+export async function deleteNotificationApi(
+  notificationId: string,
+  token: string,
+): Promise<void> {
+  await fetch(`http://localhost:5000/api/notifications/${notificationId}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
