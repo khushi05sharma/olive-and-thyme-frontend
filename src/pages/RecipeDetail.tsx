@@ -27,7 +27,7 @@ import {
   postCommentApi,
   getCommentsApi,
   deleteCommentApi,
-   getRecipeByIdApi ,
+  getRecipeByIdApi,
 } from "../services/authApi";
 
 const RecipeDetail: FC = () => {
@@ -61,48 +61,47 @@ const RecipeDetail: FC = () => {
   // ----- EFFECT 1: LOAD RECIPE --------
 
   useEffect(() => {
-  if (!id) return;
+    if (!id) return;
 
-  const loadRecipe = async () => {
-    setIsLoading(true);
-    setError(null);
+    const loadRecipe = async () => {
+      setIsLoading(true);
+      setError(null);
 
-    try {
-      let data;
+      try {
+        let data;
 
-      if (id.length > 10) {
-         const result = await getRecipeByIdApi(id);
-  const raw = result.recipe || result;
-  
-  // map _id to id so recipe.id works everywhere
-  data = {
-    ...raw,
-    id: raw._id || raw.id,  // ensure id is set correctly
-  };
-      } else {
-        data = await fetchRecipeById(id);
+        if (id.length > 10) {
+          const result = await getRecipeByIdApi(id);
+          const raw = result.recipe || result;
+
+          // map _id to id so recipe.id works everywhere
+          data = {
+            ...raw,
+            id: raw._id || raw.id, // ensure id is set correctly
+          };
+        } else {
+          data = await fetchRecipeById(id);
+        }
+
+        setRecipe(data);
+        setLikeCount(data.likes || 0);
+      } catch (error) {
+        const found = mockRecipes.find((r) => r.id === id);
+        if (found) {
+          setRecipe(found);
+          setLikeCount(found.likes);
+        } else {
+          setError("Failed to load recipe. Please try again later.");
+        }
+      } finally {
+        setIsLoading(false);
       }
+    };
 
-      setRecipe(data);
-      setLikeCount(data.likes || 0);
+    loadRecipe();
+    window.scrollTo(0, 0);
+  }, [id]);
 
-    } catch (error) {
-      const found = mockRecipes.find((r) => r.id === id);
-      if (found) {
-        setRecipe(found);
-        setLikeCount(found.likes);
-      } else {
-        setError("Failed to load recipe. Please try again later.");
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  loadRecipe();
-  window.scrollTo(0, 0);
-}, [id]);
-  
   // ----- EFFECT 2: SYNC LIKE/SAVE STATE  --------
 
   useEffect(() => {
@@ -250,7 +249,7 @@ const RecipeDetail: FC = () => {
       await deleteCommentApi(commentId, token);
 
       // remove from UI instantly
-      setComments((prev) => prev.filter((c) => c.id !== commentId));
+      setComments((prev) => prev.filter((c) => c._id !== commentId));
     } catch (error) {
       console.error("Delete failed:", error);
     }
