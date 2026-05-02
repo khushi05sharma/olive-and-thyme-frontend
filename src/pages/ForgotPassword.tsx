@@ -4,6 +4,7 @@ import { Mail, ArrowLeft, Send } from "lucide-react";
 import Button from "../components/common/Button";
 import Input from "../components/common/Input";
 import logo from "../assets/logo.png";
+import { API_BASE } from "../services/config";
 
 const ForgotPassword: FC = () => {
   const [email, setEmail] = useState("");
@@ -39,7 +40,7 @@ const ForgotPassword: FC = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/auth/forgot-password",
+        `${API_BASE}/api/auth/forgot-password`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

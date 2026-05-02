@@ -4,6 +4,7 @@ import { Lock, Eye, EyeOff, CheckCircle, ArrowLeft } from "lucide-react";
 import Button from "../components/common/Button";
 import Input from "../components/common/Input";
 import logo from "../assets/logo.png";
+import { API_BASE } from "../services/config";
 
 const ResetPassword: FC = () => {
   const { token } = useParams<{ token: string }>(); // gets token from URL
@@ -52,7 +53,7 @@ const ResetPassword: FC = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/auth/reset-password/${token}`,
+        `${API_BASE}/api/auth/reset-password/${token}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

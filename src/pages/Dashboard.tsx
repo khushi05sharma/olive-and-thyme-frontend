@@ -9,6 +9,7 @@ import Button from "../components/common/Button";
 import RecipeCard from "../components/recipe/RecipeCard";
 import { getMyRecipesApi, deleteRecipeApi } from "../services/authApi";
 import { mockRecipes } from "../data/mockRecipes";
+import { API_BASE } from "../services/config";
 
 const Dashboard: FC = () => {
   const navigate = useNavigate();
@@ -95,7 +96,7 @@ const Dashboard: FC = () => {
 
         // 2. MongoDB ID
         if (id.length > 10) {
-          const res = await fetch(`http://localhost:5000/api/recipes/${id}`);
+          const res = await fetch(`${API_BASE}/api/recipes/${id}`);
           const data = await res.json();
           return data;
         }
