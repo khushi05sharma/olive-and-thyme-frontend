@@ -1,4 +1,6 @@
-const API_URL = "http://localhost:5000/api/auth";
+import { API_BASE } from "./config";
+
+const API_URL = `${API_BASE}/api/auth`;
 
 // what a user looks like when returned from backend
 export interface AuthUser {
@@ -92,15 +94,12 @@ export async function likeRecipeApi(
   recipeId: string,
   token: string,
 ): Promise<{ liked: boolean; likedRecipes: string[] }> {
-  const response = await fetch(
-    `http://localhost:5000/api/users/like/${recipeId}`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+  const response = await fetch(`${API_BASE}/api/users/like/${recipeId}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
     },
-  );
+  });
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || "Failed to like recipe");
   return data;
@@ -112,15 +111,12 @@ export async function savedRecipeApi(
   recipeId: string,
   token: string,
 ): Promise<{ saved: boolean; savedRecipes: string[] }> {
-  const response = await fetch(
-    `http://localhost:5000/api/users/save/${recipeId}`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+  const response = await fetch(`${API_BASE}/api/users/save/${recipeId}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
     },
-  );
+  });
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || "Failed to save recipe");
   return data;
@@ -130,14 +126,11 @@ export async function savedRecipeApi(
 export async function getInteractionsApi(
   token: string,
 ): Promise<{ likedRecipes: string[]; savedRecipes: string[] }> {
-  const response = await fetch(
-    "http://localhost:5000/api/users/me/interactions",
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+  const response = await fetch(`${API_BASE}/api/users/me/interactions`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
     },
-  );
+  });
   const data = await response.json();
   if (!response.ok) throw new Error(data.message);
   return data;
@@ -159,17 +152,14 @@ export async function postCommentApi(
     createdAt: string;
   };
 }> {
-  const response = await fetch(
-    `http://localhost:5000/api/comments/${recipeId}`,
-    {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ text }),
+  const response = await fetch(`${API_BASE}/api/comments/${recipeId}`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
-  );
+    body: JSON.stringify({ text }),
+  });
 
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || "Failed to post comment");
@@ -188,9 +178,7 @@ export async function getCommentsApi(recipeId: string): Promise<{
     createdAt: string;
   }[];
 }> {
-  const response = await fetch(
-    `http://localhost:5000/api/comments/${recipeId}`,
-  );
+  const response = await fetch(`${API_BASE}/api/comments/${recipeId}`);
 
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || "Failed to fetch comments");
@@ -203,15 +191,12 @@ export async function deleteCommentApi(
   commentId: string,
   token: string,
 ): Promise<{ message: string }> {
-  const response = await fetch(
-    `http://localhost:5000/api/comments/${commentId}`,
-    {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+  const response = await fetch(`${API_BASE}/api/comments/${commentId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
     },
-  );
+  });
 
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || "Failed to delete comment");
@@ -238,7 +223,7 @@ export async function createRecipeApi(
 ): Promise<{
   recipe: { _id: string; title: string; author: { id: string; name: string } };
 }> {
-  const response = await fetch("http://localhost:5000/api/recipes", {
+  const response = await fetch(`${API_BASE}/api/recipes`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -273,7 +258,7 @@ export async function getMyRecipesApi(token: string): Promise<{
     createdAt: string;
   }[];
 }> {
-  const response = await fetch("http://localhost:5000/api/recipes/my", {
+  const response = await fetch(`${API_BASE}/api/recipes/my`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
@@ -285,7 +270,7 @@ export async function getMyRecipesApi(token: string): Promise<{
 // -------- GET SINGLE RECIPE BY ID ----------
 
 export async function getRecipeByIdApi(id: string) {
-  const response = await fetch(`http://localhost:5000/api/recipes/${id}`);
+  const response = await fetch(`${API_BASE}/api/recipes/${id}`);
 
   const data = await response.json();
 
@@ -303,17 +288,14 @@ export async function updateRecipeApi(
   recipeData: any,
   token: string,
 ): Promise<{ recipe: any }> {
-  const response = await fetch(
-    `http://localhost:5000/api/recipes/${recipeId}`,
-    {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(recipeData),
+  const response = await fetch(`${API_BASE}/api/recipes/${recipeId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
-  );
+    body: JSON.stringify(recipeData),
+  });
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || "Failed to update recipe");
 
@@ -326,13 +308,10 @@ export async function deleteRecipeApi(
   recipeId: string,
   token: string,
 ): Promise<void> {
-  const response = await fetch(
-    `http://localhost:5000/api/recipes/${recipeId}`,
-    {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    },
-  );
+  const response = await fetch(`${API_BASE}/api/recipes/${recipeId}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
 
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || "Failed to delete recipe");
@@ -355,7 +334,7 @@ export async function getNotificationsApi(token: string): Promise<{
   }[];
   unreadCount: number;
 }> {
-  const response = await fetch("http://localhost:5000/api/notifications", {
+  const response = await fetch(`${API_BASE}/api/notifications`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   const data = await response.json();
@@ -368,17 +347,17 @@ export async function markNotificationReadApi(
   notificationId: string,
   token: string,
 ): Promise<void> {
-  await fetch(
-    `http://localhost:5000/api/notifications/${notificationId}/read`,
-    { method: "PATCH", headers: { Authorization: `Bearer ${token}` } },
-  );
+  await fetch(`${API_BASE}/api/notifications/${notificationId}/read`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}` },
+  });
 }
 
 // ----- MARK ALL READ -----------
 export async function markAllNotificationsReadApi(
   token: string,
 ): Promise<void> {
-  await fetch("http://localhost:5000/api/notifications/read-all", {
+  await fetch(`${API_BASE}/api/notifications/read-all`, {
     method: "PATCH",
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -389,7 +368,7 @@ export async function deleteNotificationApi(
   notificationId: string,
   token: string,
 ): Promise<void> {
-  await fetch(`http://localhost:5000/api/notifications/${notificationId}`, {
+  await fetch(`${API_BASE}/api/notifications/${notificationId}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
   });
