@@ -12,7 +12,7 @@
 
 ---
 
-## About the Project 
+## About the Project
 
 **Olive & Thyme** is a **full-stack MERN** recipe sharing application designed with a modern UI and clean user experience in mind.
 
@@ -51,7 +51,7 @@ The frontend is built using **React, TypeScript, Tailwind CSS, and Vite**, with 
 | ---------------------------------------------------- | ------------------------------------------------------- |
 | ![Home](/src/assets/screenshots/home%20page.jpeg)    | ![Recipe](/src/assets/screenshots/recipe%20upload.jpeg) |
 | Dashboard                                            | Recipe Detail                                           |
-| --------------                                       | ----------------                                        |
+|                                                      |                                                         |
 | ![Dashboard](/src/assets/screenshots/dashbaord.jpeg) | ![Detail](/src/assets/screenshots/recipe%20page.jpeg)   |
 
 ---
