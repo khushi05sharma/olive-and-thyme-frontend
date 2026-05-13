@@ -31,17 +31,17 @@ The frontend is built using **React, TypeScript, Tailwind CSS, and Vite**, with 
 
 ## Features 🌟
 
-✅ Responsive modern UI design
-✅ Recipe discovery and filtering system
-✅ Health goal based filtering
-✅ Recipe detail page with instructions and ingredients
-✅ Interactive comments section
-✅ Save, like, and share functionality
-✅ User dashboard with recipe management
-✅ Add Recipe form with image and link
-✅ Login & Signup UI
-✅ Image fallback handling
-✅ Reusable TypeScript component architecture
+✅ Responsive modern UI design   
+✅ Recipe discovery and filtering system  
+✅ Health goal based filtering  
+✅ Recipe detail page with instructions and ingredients  
+✅ Interactive comments section  
+✅ Save, like, and share functionality  
+✅ User dashboard with recipe management  
+✅ Add Recipe form with image and link  
+✅ Login & Signup UI  
+✅ Image fallback handling  
+✅ Reusable TypeScript component architecture  
 
 ---
 
@@ -126,4 +126,5 @@ npm run dev
 ## Developer 👩‍💻
 
 **Khushi Sharma**
+
 MERN Stack Developer passionate about building responsive and user-friendly web applications with modern technologies.
