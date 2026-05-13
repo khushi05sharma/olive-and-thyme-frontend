@@ -7,12 +7,12 @@
 ## 🌸 Live Demo
 
 🔗 [View Live Project](https://olive-and-thyme-frontend.vercel.app/)  
-💻 Frontend Repository(https://github.com/khushi05sharma/olive-and-thyme-frontend)
-⚙️ Backend Repository(https://github.com/khushi05sharma/olive-and-thyme-backend)
+💻 [Frontend Repository](https://github.com/khushi05sharma/olive-and-thyme-frontend)
+⚙️ [Backend Repository](https://github.com/khushi05sharma/olive-and-thyme-backend)
 
 ---
 
-## About the Project 🧘‍♀️
+## About the Project 
 
 **Olive & Thyme** is a **full-stack MERN** recipe sharing application designed with a modern UI and clean user experience in mind.
 
@@ -75,6 +75,8 @@ The frontend is built using **React, TypeScript, Tailwind CSS, and Vite**, with 
 Service Usage
 Vercel | Frontend Deployment
 Render | Backend Deployment
+
+---
 
 ## Usage 🚀
 
