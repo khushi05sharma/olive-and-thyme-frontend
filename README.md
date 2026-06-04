@@ -31,7 +31,7 @@ The frontend is built using **React, TypeScript, Tailwind CSS, and Vite**, with 
 
 ## Features 🌟
 
-✅ Responsive modern UI design   
+✅ Responsive modern UI design  
 ✅ Recipe discovery and filtering system  
 ✅ Health goal based filtering  
 ✅ Recipe detail page with instructions and ingredients  
@@ -41,7 +41,7 @@ The frontend is built using **React, TypeScript, Tailwind CSS, and Vite**, with 
 ✅ Add Recipe form with image and link  
 ✅ Login & Signup UI  
 ✅ Image fallback handling  
-✅ Reusable TypeScript component architecture  
+✅ Reusable TypeScript component architecture
 
 ---
 
@@ -52,7 +52,7 @@ The frontend is built using **React, TypeScript, Tailwind CSS, and Vite**, with 
 | ![Home](/src/assets/screenshots/home%20page.jpeg)    | ![Recipe](/src/assets/screenshots/recipe%20upload.jpeg) |
 | Dashboard                                            | Recipe Detail                                           |
 |                                                      |                                                         |
-| ![Dashboard](/src/assets/screenshots/dashbaord.jpeg) | ![Detail](/src/assets/screenshots/recipe%20page.jpeg)   |
+| ![Dashboard](/src/assets/screenshots/dashbaord.jpeg) | ![Detail](/src/assets/screenshots/recipe detail.jpeg)   |
 
 ---
 
