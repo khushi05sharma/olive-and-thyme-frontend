@@ -16,7 +16,7 @@ import FilterSidebar, {
 import RecipeGrid from "../components/recipe/RecipeGrid";
 
 const Home: FC = () => {
-  // ─── FILTER STATE ─────────────────────────────────────────────
+  // ─── FILTER STATE ──
   const [selectedFilters, setSelectedFilters] = useState<FilterState>({
     mealType: [],
     cuisine: [],
@@ -24,28 +24,28 @@ const Home: FC = () => {
     healthGoals: [], // CLEANED — removed unnecessary type annotation
   });
 
-  // ─── RECIPE STATE ─────────────────────────────────────────────
+  // ─── RECIPE STATE ─
   const [recipes, setRecipes] = useState<Recipe[]>([]);
 
-  // FIXED — initialise with mock so TrendingSection is never empty on first render
-  // Once API responds, this gets replaced with real data automatically
+  // initialise with mock so TrendingSection is never empty on first render
+  // once API responds, this gets replaced with real data automatically
   const [trendingRecipes, setTrendingRecipes] = useState<Recipe[]>(
     mockRecipes.slice(0, 4),
   );
 
-  // NEW — tracks if trending is still loading from API
+  // tracks if trending is still loading from API
   const [isTrendingLoading, setIsTrendingLoading] = useState(true);
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // ─── SEARCH PARAMS ────────────────────────────────────────────
-  // NEW — reads /?search=pasta from URL
+  // ─── SEARCH PARAMS ─
+  // reads /?search=pasta from URL
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const searchQuery = searchParams.get("search") ?? "";
 
-  // ─── EFFECT 1: TRENDING ───────────────────────────────────────
+  // ─── EFFECT 1: TRENDING ───
   useEffect(() => {
     const loadTrending = async () => {
       setIsTrendingLoading(true);
@@ -73,8 +73,8 @@ const Home: FC = () => {
     loadTrending();
   }, []);
 
-  // ─── EFFECT 2: ALL RECIPES with debounce ──────────────────────
-  // UPDATED — now also watches searchQuery so search triggers a fetch
+  // ─── EFFECT 2: ALL RECIPES with debounce ─
+  // also watches searchQuery so search triggers a fetch
   useEffect(() => {
     const timer = setTimeout(async () => {
       setIsLoading(true);
@@ -82,7 +82,7 @@ const Home: FC = () => {
 
       try {
         const data = await fetchRecipes(
-          searchQuery || "healthy", // CHANGED — use search query, fallback to "healthy"
+          searchQuery || "healthy", // use search query, fallback to "healthy"
           selectedFilters.healthGoals,
           selectedFilters.mealType[0] ?? "",
           selectedFilters.cuisine[0] ?? "",
@@ -123,12 +123,12 @@ const Home: FC = () => {
     return () => clearTimeout(timer);
   }, [selectedFilters, searchQuery]); // UPDATED — searchQuery added as dependency
 
-  // ─── RENDER ───────────────────────────────────────────────────
+  // ─── RENDER ──
   return (
     <div className="min-h-screen bg-primary-light">
       <HeroSection />
 
-      {/* UPDATED — pass isLoading so TrendingSection shows skeleton */}
+      {/* pass isLoading so TrendingSection shows skeleton */}
       <TrendingSection
         recipes={trendingRecipes}
         isLoading={isTrendingLoading}
@@ -146,13 +146,13 @@ const Home: FC = () => {
             </p>
           </div>
 
-          {/* NEW — search indicator banner */}
+          {/*=search indicator banner */}
           {searchQuery && (
             <div className="p-3 mb-6 text-sm border border-orange-200 rounded-lg bg-orange-50">
               <span className="text-orange-700">
                 Showing results for: <strong>"{searchQuery}"</strong>
               </span>
-              {/* Clear button navigates back to home with no search param */}
+
               <button
                 onClick={() => navigate("/")}
                 className="ml-2 text-orange-500 underline hover:text-orange-700"
