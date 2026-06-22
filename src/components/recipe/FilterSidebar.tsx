@@ -89,7 +89,7 @@ const FilterSidebar: FC<FilterSidebarProps> = ({
   onFilterChange,
   recipeCount,
 }) => {
-  // Track which filter sections are expanded (mobile)
+  // track which filter sections are expanded (mobile)
   const [expandedSections, setExpandedSections] = useState({
     mealType: true,
     cuisine: true,
@@ -109,7 +109,7 @@ const FilterSidebar: FC<FilterSidebarProps> = ({
         [category]: current.filter((item) => item !== value),
       });
     } else {
-      // If not selected, add it
+      // if not selected, add it
       onFilterChange({
         ...selectedFilters,
         [category]: [...current, value],

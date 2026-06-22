@@ -1,11 +1,7 @@
 import { type FC, useState, useEffect } from "react";
-
-// ─── IMPORTS ──────────────────────────────────────────────────
 import { mockRecipes } from "../data/mockRecipes";
 import { fetchRecipes, fetchTrendingRecipes } from "../services/spoonacularApi";
 import { type Recipe } from "../types/recipe";
-
-// NEW — for reading URL search param
 import { useSearchParams, useNavigate } from "react-router-dom";
 
 import HeroSection from "../components/home/HeroSection";
@@ -21,14 +17,14 @@ const Home: FC = () => {
     mealType: [],
     cuisine: [],
     diet: [],
-    healthGoals: [], // CLEANED — removed unnecessary type annotation
+    healthGoals: [], 
   });
 
-  // ─── RECIPE STATE ─
+  // ─ RECIPE STATE ─
   const [recipes, setRecipes] = useState<Recipe[]>([]);
 
   // initialise with mock so TrendingSection is never empty on first render
-  // once API responds, this gets replaced with real data automatically
+  // once API responds, this gets replaced with real data automaticaly
   const [trendingRecipes, setTrendingRecipes] = useState<Recipe[]>(
     mockRecipes.slice(0, 4),
   );
@@ -45,7 +41,7 @@ const Home: FC = () => {
   const navigate = useNavigate();
   const searchQuery = searchParams.get("search") ?? "";
 
-  // ─── EFFECT 1: TRENDING ───
+  // ─ EFFECT 1: TRENDING ───
   useEffect(() => {
     const loadTrending = async () => {
       setIsTrendingLoading(true);
@@ -74,7 +70,7 @@ const Home: FC = () => {
   }, []);
 
   // ─── EFFECT 2: ALL RECIPES with debounce ─
-  // also watches searchQuery so search triggers a fetch
+  // also watches searchQuery so search trigger a fetch
   useEffect(() => {
     const timer = setTimeout(async () => {
       setIsLoading(true);
@@ -92,7 +88,7 @@ const Home: FC = () => {
         if (data.length > 0) {
           setRecipes(data);
         } else {
-          // API limit hit — fall back to mock with local filtering
+          // API limit hit — fall back to mock with local filtring
           const filtered = mockRecipes.filter((r) => {
             const matchMeal =
               selectedFilters.mealType.length === 0 ||
@@ -121,7 +117,7 @@ const Home: FC = () => {
     }, 500); // 500ms debounce for filters
 
     return () => clearTimeout(timer);
-  }, [selectedFilters, searchQuery]); // UPDATED — searchQuery added as dependency
+  }, [selectedFilters, searchQuery]); //  searchQuery added as dependecy
 
   // ─── RENDER ──
   return (

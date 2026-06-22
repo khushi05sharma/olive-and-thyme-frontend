@@ -1,10 +1,9 @@
 import { type Recipe } from "../types/recipe";
 import { type FilterState } from "../components/recipe/FilterSidebar";
 
-/**
- * Applies selected filters to recipe array
- * Returns filtered recipes based on meal type, cuisine, and diet
- */
+// Applies selected filters to recipe array 
+// Returns filtered recipes based on meal type, cuisine, and diet
+
 export const filterRecipes = (
   recipes: Recipe[],
   filters: FilterState,

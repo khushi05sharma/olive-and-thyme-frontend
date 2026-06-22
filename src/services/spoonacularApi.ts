@@ -4,7 +4,7 @@ import { type Recipe } from "../types/recipe";
 const API_KEY = import.meta.env.VITE_SPOONACULAR_KEY;
 const BASE_URL = "https://api.spoonacular.com";
 
-// ─── PART 2: SPOONACULAR DATA SHAPES ──────────────────────────
+// ─── PART 2: SPOONACULAR DATA SHAPES ───────
 interface SpoonacularRecipe {
   id: number;
   title: string;
@@ -71,7 +71,7 @@ const mealTypeToApiType: Record<string, string> = {
   Drinks: "beverage",
 };
 
-// ─── PART 4: CONVERTER ────────────────────────────────────────
+// ─── PART 4: CONVERTER ────────────────
 function toRecipe(s: SpoonacularRecipe): Recipe {
   return {
     id: String(s.id),
@@ -104,7 +104,7 @@ function toRecipe(s: SpoonacularRecipe): Recipe {
   };
 }
 
-// ─── PART 5: FUNCTIONS ────────────────────────────────────────
+// ─── PART 5: FUNCTIONS ────
 
 export async function fetchRecipes(
   query: string = "healthy",
@@ -155,9 +155,9 @@ export async function fetchRecipes(
 
 export async function fetchTrendingRecipes(): Promise<Recipe[]> {
   const url = new URL(`${BASE_URL}/recipes/complexSearch`);
-  
-  // FIXED — "popular" is not a food keyword, returns empty
-  // Use broad term so API has many recipes to sort by popularity
+
+  // "popular" is not a food keyword, returns empty
+  // use broad term so API has many recipes to sort by popularity
   url.searchParams.set("query", "food");
   url.searchParams.set("sort", "popularity");
   url.searchParams.set("number", "4");
