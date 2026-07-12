@@ -6,9 +6,15 @@
 
 ## 🌸 Live Demo
 
-🔗 [View Live Project](https://olive-and-thyme-frontend.vercel.app/)  
-💻 [Frontend Repository](https://github.com/khushi05sharma/olive-and-thyme-frontend)
-⚙️ [Backend Repository](https://github.com/khushi05sharma/olive-and-thyme-backend)
+🔗 **Live Application:** https://olive-and-thyme-frontend.vercel.app/
+
+## 📂 Related Repositories
+
+💻 **Frontend:** https://github.com/khushi05sharma/olive-and-thyme-frontend
+
+⚙️ **Backend:** https://github.com/khushi05sharma/olive-and-thyme-backend
+
+🐳 **Docker Setup:** https://github.com/khushi05sharma/olive-thyme-docker
 
 ---
 
@@ -67,6 +73,7 @@ The frontend is built using **React, TypeScript, Tailwind CSS, and Vite**, with 
 | 🗄️ Backend        | Node.js, Express.js, MongoDB    |
 | 🔐 Authentication | JWT Authentication              |
 | ☁️ Deployment     | Vercel, Render                  |
+| 🐳 Containerization | Docker, Docker Compose |
 
 ---
 
@@ -75,6 +82,23 @@ The frontend is built using **React, TypeScript, Tailwind CSS, and Vite**, with 
 Service Usage
 Vercel | Frontend Deployment
 Render | Backend Deployment
+
+---
+## 🐳 Docker Support
+
+This project has also been containerized using Docker.
+
+The Docker setup includes:
+
+- Multi-stage Docker builds
+- Nginx for serving the React production build
+- Docker Compose orchestration
+- Environment variable management
+- Frontend and backend container networking
+
+See the complete Docker configuration here:
+
+➡️ https://github.com/khushi05sharma/olive-thyme-docker
 
 ---
 
