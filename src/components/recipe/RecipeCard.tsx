@@ -27,7 +27,7 @@ const RecipeCard: FC<RecipeCardProps> = ({ recipe }) => {
   // Toggle like state
 
   const handleLike = (e: MouseEvent<HTMLButtonElement>): void => {
-    e.stopPropagation(); // Don't navigate when clicking like
+    e.stopPropagation(); 
 
     setIsLiked(!isLiked);
     // Increment or decrement like count

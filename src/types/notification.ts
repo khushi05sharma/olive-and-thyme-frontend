@@ -7,9 +7,6 @@ export type NotificationType = "like" | "comment" | "follow" | "system";
 /**
  * Notification interface
  * Represents a single notification
- *
- * Phase 1: Mock data
- * Phase 3: Stored in MongoDB, fetched from: GET /api/notifications
  */
 
 export interface Notification {

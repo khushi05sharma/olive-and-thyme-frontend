@@ -74,8 +74,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     checkSavedLogin();
   }, []); // runs once when app first loads
 
-  //loginApi() = ask backend to log in
-  // login() = save that successful login in frontend
+  // login() = save successful login in frontend
 
   const login = async (newToken: string, newUser: AuthUser) => {
   localStorage.setItem("olive_token", newToken);
